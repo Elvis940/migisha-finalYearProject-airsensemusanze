@@ -199,7 +199,6 @@
         .chart-container {
             width: 100%;
             height: calc(100% - 30px);
-            position: relative;
         }
 
         .chart-tabs {
@@ -219,6 +218,24 @@
         .chart-tab.active {
             color: #1e3a8a;
             border-bottom-color: #1e3a8a;
+        }
+
+        /* User Info Section */
+        .user-info {
+            margin-top: 2rem;
+        }
+
+        .user-info-card {
+            padding: 1.5rem;
+        }
+
+        .user-info-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info-item strong {
+            display: inline-block;
+            width: 80px;
         }
 
         /* Footer */
@@ -462,7 +479,7 @@
             }
         }
 
-        // Initialize chart with proper bounds
+        // Initialize chart
         function initChart() {
             const ctx = document.getElementById('dataChart').getContext('2d');
             
@@ -476,10 +493,8 @@
                         borderColor: '#1e3a8a',
                         backgroundColor: 'rgba(30, 58, 138, 0.1)',
                         borderWidth: 2,
-                        tension: 0.1,
-                        fill: true,
-                        pointRadius: 3,
-                        pointHoverRadius: 6
+                        tension: 0.4,
+                        fill: true
                     }]
                 },
                 options: {
@@ -487,84 +502,37 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: false,
-                            grace: '10%',
-                            min: 0,
-                            max: Math.max(...historicalData.aqi) + 20,
-                            ticks: {
-                                precision: 0,
-                                padding: 10
-                            },
-                            grid: {
-                                drawBorder: true,
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
+                            beginAtZero: false
                         },
                         x: {
                             ticks: {
                                 maxRotation: 45,
-                                minRotation: 45,
-                                autoSkip: true,
-                                maxTicksLimit: 10,
-                                padding: 10
-                            },
-                            grid: {
-                                display: false,
-                                drawBorder: true
+                                minRotation: 45
                             }
                         }
                     },
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'top',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true
-                            }
+                            position: 'top'
                         },
                         tooltip: {
                             mode: 'index',
-                            intersect: false,
-                            padding: 10,
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            bodySpacing: 5,
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}`;
-                                }
-                            }
+                            intersect: false
                         }
                     },
                     interaction: {
                         mode: 'nearest',
                         axis: 'x',
                         intersect: false
-                    },
-                    layout: {
-                        padding: {
-                            top: 20,
-                            right: 20,
-                            bottom: 20,
-                            left: 20
-                        }
-                    },
-                    elements: {
-                        line: {
-                            borderJoinStyle: 'round'
-                        },
-                        point: {
-                            hoverRadius: 8,
-                            hitRadius: 10
-                        }
                     }
                 }
             });
         }
 
-        // Update chart data with proper bounds
+        // Update chart data
         function updateChart(dataType) {
-            let label, data, borderColor, backgroundColor, min, max;
+            let label, data, borderColor, backgroundColor;
             
             switch(dataType) {
                 case 'temperature':
@@ -572,16 +540,12 @@
                     data = historicalData.temperature;
                     borderColor = '#ef4444';
                     backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                    min = Math.floor(Math.min(...data)) - 2;
-                    max = Math.ceil(Math.max(...data)) + 2;
                     break;
                 case 'humidity':
                     label = 'Humidity (%)';
                     data = historicalData.humidity;
                     borderColor = '#3b82f6';
                     backgroundColor = 'rgba(59, 130, 246, 0.1)';
-                    min = 0;
-                    max = 100;
                     break;
                 case 'aqi':
                 default:
@@ -589,8 +553,6 @@
                     data = historicalData.aqi;
                     borderColor = '#1e3a8a';
                     backgroundColor = 'rgba(30, 58, 138, 0.1)';
-                    min = 0;
-                    max = Math.ceil(Math.max(...data)) + 20;
                     break;
             }
             
@@ -600,15 +562,9 @@
                 borderColor: borderColor,
                 backgroundColor: backgroundColor,
                 borderWidth: 2,
-                tension: 0.1,
-                fill: true,
-                pointRadius: 3,
-                pointHoverRadius: 6
+                tension: 0.4,
+                fill: true
             }];
-            
-            // Update y-axis scale based on data type
-            dataChart.options.scales.y.min = min;
-            dataChart.options.scales.y.max = max;
             
             dataChart.update();
         }
@@ -622,17 +578,15 @@
             });
         });
 
-        // Process historical data for chart with proper time formatting
+        // Process historical data for chart
         function processHistoricalData(data) {
+            // Clear existing data
             historicalData = {
                 aqi: [],
                 temperature: [],
                 humidity: [],
                 timestamps: []
             };
-            
-            // Sort data by timestamp (oldest first)
-            data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             
             // Process each data point
             data.forEach(item => {
@@ -646,14 +600,6 @@
                 const minutes = date.getMinutes().toString().padStart(2, '0');
                 historicalData.timestamps.push(`${hours}:${minutes}`);
             });
-            
-            // If we have too many data points, show only every nth label
-            if (historicalData.timestamps.length > 15) {
-                const step = Math.ceil(historicalData.timestamps.length / 10);
-                historicalData.timestamps = historicalData.timestamps.map((ts, i) => 
-                    i % step === 0 ? ts : ''
-                );
-            }
         }
 
         // Update dashboard with latest data
@@ -687,7 +633,7 @@
                     if (!dataChart) {
                         initChart();
                     } else {
-                        updateChart(document.querySelector('.chart-tab.active').dataset.chart);
+                        updateChart('aqi'); // Default to AQI chart
                     }
                 }
             } catch (error) {

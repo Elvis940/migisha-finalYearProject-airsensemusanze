@@ -40,12 +40,15 @@ class CustomUser(AbstractUser):
         return f"{self.first_name} {self.last_name}"
 
 
-# ✅ Add this below the CustomUser class
 class SensorData(models.Model):
-    aqi = models.FloatField()
-    temperature = models.FloatField()
-    humidity = models.FloatField()
+    aqi = models.FloatField(help_text="Air Quality Index value")
+    temperature = models.FloatField(help_text="Temperature in Celsius")
+    humidity = models.FloatField(help_text="Relative humidity percentage")
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name_plural = "Sensor Data"
+
     def __str__(self):
-        return f"AQI: {self.aqi}, Temp: {self.temperature}°C, Humidity: {self.humidity}%"
+        return f"Sensor Reading at {self.timestamp}"

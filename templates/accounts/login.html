@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - AirSense Musanze</title>
     <style>
         body {
@@ -12,6 +12,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
         }
         
         header {
@@ -19,6 +20,9 @@
             color: white;
             padding: 1rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .header-container {
@@ -38,6 +42,7 @@
             font-weight: bold;
             text-decoration: none;
             color: white;
+            font-size: clamp(1rem, 4vw, 1.25rem);
         }
         
         .logo svg {
@@ -60,16 +65,18 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
+            margin: 1rem;
         }
         
         h1 {
             text-align: center;
             color: #1e3a8a;
             margin-bottom: 1.5rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
         }
         
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
         
@@ -77,14 +84,25 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
+            font-size: 1rem;
         }
         
         .form-group input {
             width: 100%;
-            padding: 0.75rem;
+            padding: 1rem;
             border: 1px solid #ddd;
-            border-radius: 0.25rem;
+            border-radius: 0.5rem;
             box-sizing: border-box;
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            min-height: 50px;
+        }
+        
+        .form-group input:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
         }
         
         .password-container {
@@ -93,26 +111,36 @@
         
         .toggle-password {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
             color: #6b7280;
+            padding: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
         }
         
         .login-btn {
             width: 100%;
-            padding: 0.75rem;
+            padding: 1rem;
             background-color: #2563eb;
             color: white;
             border: none;
-            border-radius: 0.25rem;
+            border-radius: 0.5rem;
             font-weight: 600;
             cursor: pointer;
             margin-top: 1rem;
+            font-size: 1rem;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.2s;
         }
         
-        .login-btn:hover {
+        .login-btn:hover, .login-btn:active {
             background-color: #1d4ed8;
         }
         
@@ -120,22 +148,44 @@
             color: #dc2626;
             margin-top: 1rem;
             text-align: center;
+            font-size: 0.9rem;
         }
+        
         .par {
             text-align: center;
             color: #6b7280;
             margin-bottom: 1.5rem;
             font-weight: bold;
             color: black;
+            font-size: clamp(0.9rem, 3vw, 1rem);
         }
         
         @media (max-width: 480px) {
             .login-container {
                 padding: 1.5rem;
+                margin: 0.5rem;
+                border-radius: 0.75rem;
             }
             
             .header-container {
                 padding: 0.5rem;
+            }
+            
+            body {
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            
+            .form-group input {
+                padding: 0.9rem;
+            }
+        }
+        
+        /* Prevent zoom on iOS < 10 */
+        @media screen and (-webkit-min-device-pixel-ratio:0) {
+            select,
+            textarea,
+            input {
+                font-size: 16px !important;
             }
         }
     </style>
@@ -167,14 +217,14 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
+                    <input type="text" id="username" name="username" required autocomplete="username">
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-container">
-                        <input type="password" id="password" name="password" required>
-                        <span class="toggle-password" onclick="togglePasswordVisibility()">
+                        <input type="password" id="password" name="password" required autocomplete="current-password">
+                        <span class="toggle-password" onclick="togglePasswordVisibility()" role="button" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
@@ -201,6 +251,21 @@
                 eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
             }
         }
+        
+        // Make the password toggle work on touch devices
+        document.querySelector('.toggle-password').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            togglePasswordVisibility();
+        });
+        
+        // Scroll input into view when focused (helps with keyboard covering fields)
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        });
     </script>
 </body>
 </html>

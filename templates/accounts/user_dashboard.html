@@ -424,7 +424,7 @@
         // Function to fetch latest data from server
         async function fetchLatestData() {
             try {
-                const response = await fetch('/api/latest-sensor-data/');
+                const response = await fetch('/accounts/api/sensordata/latest/');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -484,7 +484,7 @@
 
         // Update the dashboard with new data
         async function updateDashboard() {
-            const latestData = await fetchLatestData();
+            const latestData = await fetchLatestData(/accounts/api/sensordata/latest/');
             
             if (latestData) {
                 // Update the data object

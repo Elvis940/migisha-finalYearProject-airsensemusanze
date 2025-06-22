@@ -113,6 +113,7 @@ def login_view(request):
                 messages.error(request, "Invalid credentials.")
     
     return render(request, 'accounts/login.html')
+    
 def user_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -122,8 +123,27 @@ def user_dashboard(request):
         logout(request)
         return redirect('login')
     
-    # You can add any context data needed for the user dashboard here
-    return render(request, 'accounts/user_dashboard.html')
+    # Get the latest sensor data for the initial page load
+    try:
+        latest_data = SensorData.objects.latest('timestamp')
+        initial_data = {
+            'aqi': latest_data.aqi,
+            'temperature': latest_data.temperature,
+            'humidity': latest_data.humidity,
+            'timestamp': latest_data.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }
+    except SensorData.DoesNotExist:
+        initial_data = {
+            'aqi': 0,
+            'temperature': 0,
+            'humidity': 0,
+            'timestamp': 'No data available'
+        }
+    
+    return render(request, 'accounts/user_dashboard.html', {
+        'user': request.user,
+        'initial_data': initial_data
+    })
 
 def dashboard(request):
     if not request.user.is_authenticated:

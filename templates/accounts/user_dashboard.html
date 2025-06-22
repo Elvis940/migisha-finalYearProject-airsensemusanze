@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>User Dashboard - AirSense Musanze</title>
-    <!-- Include Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Base Styles */
@@ -87,14 +86,22 @@
             box-sizing: border-box;
         }
 
-        /* Dashboard Cards */
-        .aqi-container {
+        /* Metrics Section */
+        .metrics-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
             gap: 1rem;
             width: 100%;
             margin-top: 1rem;
+        }
+
+        .metrics-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            width: 100%;
+            flex-wrap: wrap;
         }
 
         .card {
@@ -115,14 +122,12 @@
         .aqi-card {
             color: white;
             text-align: center;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            flex: 1 1 30%;
+            min-width: 200px;
         }
 
         .aqi-label {
-            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            font-size: clamp(1rem, 4vw, 1.2rem);
             font-weight: 600;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
@@ -130,14 +135,14 @@
         }
 
         .aqi-value {
-            font-size: clamp(3rem, 15vw, 5rem);
+            font-size: clamp(2rem, 8vw, 3rem);
             font-weight: bold;
             margin: 1rem 0;
             line-height: 1;
         }
 
         .aqi-status {
-            font-size: clamp(1rem, 5vw, 1.5rem);
+            font-size: clamp(0.8rem, 3vw, 1rem);
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
@@ -147,21 +152,13 @@
             opacity: 0.8;
         }
 
-        .metrics-row {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            gap: 1rem;
-            width: 100%;
-            flex-wrap: wrap;
-        }
-
         .metric-card {
-            flex: 1 1 200px;
+            flex: 1 1 30%;
+            min-width: 200px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 1rem;
-            min-width: 0;
         }
 
         .metric-card svg {
@@ -191,18 +188,55 @@
             position: relative;
         }
 
-        .chart-container {
-            width: 100%;
-            height: 100%;
+        .graph-title {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3a8a;
         }
 
-        /* AQI Colors */
-        .aqi-good { background-color: #10b981; }
-        .aqi-moderate { background-color: #f59e0b; }
-        .aqi-unhealthy-sensitive { background-color: #f97316; }
-        .aqi-unhealthy { background-color: #ef4444; }
-        .aqi-very-unhealthy { background-color: #8b5cf6; }
-        .aqi-hazardous { background-color: #7f1d1d; }
+        .chart-container {
+            width: 100%;
+            height: calc(100% - 30px);
+        }
+
+        .chart-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .chart-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .chart-tab.active {
+            color: #1e3a8a;
+            border-bottom-color: #1e3a8a;
+        }
+
+        /* User Info Section */
+        .user-info {
+            margin-top: 2rem;
+        }
+
+        .user-info-card {
+            padding: 1.5rem;
+        }
+
+        .user-info-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info-item strong {
+            display: inline-block;
+            width: 80px;
+        }
 
         /* Footer */
         footer {
@@ -228,14 +262,27 @@
             text-decoration: underline;
         }
 
+        /* AQI Colors */
+        .aqi-good { background-color: #10b981; }
+        .aqi-moderate { background-color: #f59e0b; }
+        .aqi-unhealthy-sensitive { background-color: #f97316; }
+        .aqi-unhealthy { background-color: #ef4444; }
+        .aqi-very-unhealthy { background-color: #8b5cf6; }
+        .aqi-hazardous { background-color: #7f1d1d; }
+
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .metrics-row {
                 flex-direction: column;
             }
 
-            .metric-card {
+            .aqi-card, .metric-card {
                 flex: 1 1 auto;
+                width: 100%;
+            }
+
+            .graph-card {
+                height: 300px;
             }
         }
 
@@ -244,8 +291,13 @@
                 padding: 0.75rem;
             }
 
-            .contact-link {
-                display: none;
+            .header-nav {
+                gap: 1rem;
+            }
+
+            .graph-card {
+                height: 250px;
+                padding: 1rem;
             }
         }
     </style>
@@ -269,18 +321,17 @@
 
     <!-- Main Content -->
     <main>
-        <!-- Real-time Data Section -->
-        <div class="aqi-container">
-            <!-- AQI Card -->
-            <div class="card aqi-card" id="aqi-card">
-                <p class="aqi-label">Musanze District AQI</p>
-                <div class="aqi-value" id="aqi-value">--</div>
-                <p class="aqi-status" id="aqi-status">Loading...</p>
-                <p class="aqi-update" id="aqi-update">Last updated: --</p>
-            </div>
-
-            <!-- Temperature & Humidity Row -->
+        <!-- Metrics Section -->
+        <div class="metrics-container">
             <div class="metrics-row">
+                <!-- AQI Card -->
+                <div class="card aqi-card" id="aqi-card">
+                    <p class="aqi-label">Musanze District AQI</p>
+                    <div class="aqi-value" id="aqi-value">--</div>
+                    <p class="aqi-status" id="aqi-status">Loading...</p>
+                    <p class="aqi-update" id="aqi-update">Last updated: --</p>
+                </div>
+
                 <!-- Temperature Card -->
                 <div class="card metric-card">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -305,11 +356,17 @@
             </div>
         </div>
 
-        <!-- Data Visualization Section -->
+        <!-- Graph Section -->
         <div class="graph-container">
             <div class="card graph-card">
+                <h3 class="graph-title">Air Quality Data Visualization</h3>
+                <div class="chart-tabs">
+                    <div class="chart-tab active" data-chart="aqi">AQI</div>
+                    <div class="chart-tab" data-chart="temperature">Temperature</div>
+                    <div class="chart-tab" data-chart="humidity">Humidity</div>
+                </div>
                 <div class="chart-container">
-                    <canvas id="sensorChart"></canvas>
+                    <canvas id="dataChart"></canvas>
                 </div>
             </div>
         </div>
@@ -325,101 +382,17 @@
     </footer>
 
     <script>
-        // Initialize data variables
-        const aqiData = {
-            aqi: 0,
-            temperature: 0,
-            humidity: 0,
-            lastUpdated: new Date()
-        };
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
 
         // Chart variables
-        let sensorChart;
-        const chartData = {
-            labels: [],
-            datasets: [
-                {
-                    label: 'AQI',
-                    data: [],
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                    tension: 0.1,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Temperature (°C)',
-                    data: [],
-                    borderColor: 'rgb(239, 68, 68)',
-                    backgroundColor: 'rgba(239, 68, 68, 0.5)',
-                    tension: 0.1,
-                    yAxisID: 'y1'
-                },
-                {
-                    label: 'Humidity (%)',
-                    data: [],
-                    borderColor: 'rgb(16, 185, 129)',
-                    backgroundColor: 'rgba(16, 185, 129, 0.5)',
-                    tension: 0.1,
-                    yAxisID: 'y2'
-                }
-            ]
+        let dataChart;
+        let historicalData = {
+            aqi: [],
+            temperature: [],
+            humidity: [],
+            timestamps: []
         };
-
-        // Initialize the chart
-        function initChart() {
-            const ctx = document.getElementById('sensorChart').getContext('2d');
-            sensorChart = new Chart(ctx, {
-                type: 'line',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'AQI'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                            title: {
-                                display: true,
-                                text: 'Temperature (°C)'
-                            }
-                        },
-                        y2: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                            title: {
-                                display: true,
-                                text: 'Humidity (%)'
-                            },
-                            // Adjust the position to prevent overlap
-                            afterFit: function(scale) {
-                                scale.paddingRight = 80; // Adjust this value as needed
-                            }
-                        }
-                    }
-                }
-            });
-        }
 
         // Function to fetch latest data from server
         async function fetchLatestData() {
@@ -442,6 +415,27 @@
             }
         }
 
+        // Function to fetch historical data for charts
+        async function fetchHistoricalData() {
+            try {
+                const response = await fetch('/accounts/api/sensordata/historical/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.data;
+                } else {
+                    console.error('Failed to fetch historical data:', data.message);
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error fetching historical data:', error);
+                return [];
+            }
+        }
+
         function getDefaultData() {
             return {
                 aqi: 0,
@@ -452,72 +446,203 @@
         }
 
         function getAqiDetails(aqi) {
-            if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good' };
-            if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate' };
-            if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive' };
-            if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy' };
-            if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy' };
-            return { level: 'Hazardous', colorClass: 'aqi-hazardous' };
+            if (aqi <= 50) {
+                return {
+                    level: 'Good',
+                    colorClass: 'aqi-good',
+                };
+            } else if (aqi <= 100) {
+                return {
+                    level: 'Moderate',
+                    colorClass: 'aqi-moderate',
+                };
+            } else if (aqi <= 150) {
+                return {
+                    level: 'Unhealthy for Sensitive Groups',
+                    colorClass: 'aqi-unhealthy-sensitive',
+                };
+            } else if (aqi <= 200) {
+                return {
+                    level: 'Unhealthy',
+                    colorClass: 'aqi-unhealthy',
+                };
+            } else if (aqi <= 300) {
+                return {
+                    level: 'Very Unhealthy',
+                    colorClass: 'aqi-very-unhealthy',
+                };
+            } else {
+                return {
+                    level: 'Hazardous',
+                    colorClass: 'aqi-hazardous',
+                };
+            }
         }
 
-        // Update the chart with new data
-        function updateChart(newData) {
-            const now = new Date();
-            const timeLabel = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('dataChart').getContext('2d');
             
-            // Add new data point
-            chartData.labels.push(timeLabel);
-            chartData.datasets[0].data.push(newData.aqi);
-            chartData.datasets[1].data.push(newData.temperature);
-            chartData.datasets[2].data.push(newData.humidity);
+            dataChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: historicalData.timestamps,
+                    datasets: [{
+                        label: 'AQI',
+                        data: historicalData.aqi,
+                        borderColor: '#1e3a8a',
+                        backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        // Update chart data
+        function updateChart(dataType) {
+            let label, data, borderColor, backgroundColor;
             
-            // Keep only the last 20 data points
-            const maxDataPoints = 20;
-            if (chartData.labels.length > maxDataPoints) {
-                chartData.labels.shift();
-                chartData.datasets.forEach(dataset => dataset.data.shift());
+            switch(dataType) {
+                case 'temperature':
+                    label = 'Temperature (°C)';
+                    data = historicalData.temperature;
+                    borderColor = '#ef4444';
+                    backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    break;
+                case 'humidity':
+                    label = 'Humidity (%)';
+                    data = historicalData.humidity;
+                    borderColor = '#3b82f6';
+                    backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                    break;
+                case 'aqi':
+                default:
+                    label = 'AQI';
+                    data = historicalData.aqi;
+                    borderColor = '#1e3a8a';
+                    backgroundColor = 'rgba(30, 58, 138, 0.1)';
+                    break;
             }
             
-            // Update the chart
-            sensorChart.update();
+            dataChart.data.datasets = [{
+                label: label,
+                data: data,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }];
+            
+            dataChart.update();
         }
 
-        // Update the dashboard with new data
+        // Tab switching for charts
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                updateChart(this.dataset.chart);
+            });
+        });
+
+        // Process historical data for chart
+        function processHistoricalData(data) {
+            // Clear existing data
+            historicalData = {
+                aqi: [],
+                temperature: [],
+                humidity: [],
+                timestamps: []
+            };
+            
+            // Process each data point
+            data.forEach(item => {
+                historicalData.aqi.push(item.aqi);
+                historicalData.temperature.push(item.temperature);
+                historicalData.humidity.push(item.humidity);
+                
+                // Format timestamp for display
+                const date = new Date(item.timestamp);
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                historicalData.timestamps.push(`${hours}:${minutes}`);
+            });
+        }
+
+        // Update dashboard with latest data
         async function updateDashboard() {
-            const latestData = await fetchLatestData(/accounts/api/sensordata/latest/');
-            
-            if (latestData) {
-                // Update the data object
-                aqiData.aqi = latestData.aqi;
-                aqiData.temperature = latestData.temperature;
-                aqiData.humidity = latestData.humidity;
-                aqiData.lastUpdated = new Date(latestData.timestamp);
+            try {
+                // Fetch latest data point
+                const latestData = await fetchLatestData();
                 
-                // Update the UI
-                const aqiDetails = getAqiDetails(aqiData.aqi);
-                const aqiCard = document.getElementById('aqi-card');
-                aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
-                document.getElementById('aqi-value').textContent = Math.round(aqiData.aqi);
-                document.getElementById('aqi-status').textContent = aqiDetails.level;
-                document.getElementById('aqi-update').textContent = `Last updated: ${aqiData.lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                document.getElementById('temperature').textContent = `${Math.round(aqiData.temperature)}°C`;
-                document.getElementById('humidity').textContent = `${Math.round(aqiData.humidity)}%`;
+                if (latestData) {
+                    const aqiDetails = getAqiDetails(latestData.aqi);
+                    const aqiCard = document.getElementById('aqi-card');
+                    
+                    // Update AQI card
+                    aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
+                    document.getElementById('aqi-value').textContent = Math.round(latestData.aqi);
+                    document.getElementById('aqi-status').textContent = aqiDetails.level;
+                    
+                    // Update temperature and humidity
+                    document.getElementById('temperature').textContent = `${Math.round(latestData.temperature)}°C`;
+                    document.getElementById('humidity').textContent = `${Math.round(latestData.humidity)}%`;
+                    
+                    // Update timestamp
+                    const lastUpdated = new Date(latestData.timestamp);
+                    document.getElementById('aqi-update').textContent = `Last updated: ${lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                }
                 
-                // Update the chart
-                updateChart({
-                    aqi: aqiData.aqi,
-                    temperature: aqiData.temperature,
-                    humidity: aqiData.humidity
-                });
+                // Fetch and update historical data for chart
+                const historical = await fetchHistoricalData();
+                if (historical.length > 0) {
+                    processHistoricalData(historical);
+                    if (!dataChart) {
+                        initChart();
+                    } else {
+                        updateChart('aqi'); // Default to AQI chart
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
             }
         }
-
-        // Set current year in footer
-        document.getElementById('current-year').textContent = new Date().getFullYear();
 
         // Initialize and update every 15 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            initChart();
             updateDashboard();
             setInterval(updateDashboard, 15000);
         });

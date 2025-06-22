@@ -14,5 +14,6 @@ urlpatterns = [
     path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
     path('api/sensordata/latest/', views.latest_sensor_data, name='latest_sensor_data'),
     path('api/sensordata/', views.receive_sensor_data, name='receive_sensor_data'),
+     path('api/sensordata/historical/', views.historical_sensor_data, name='historical_sensor_data'),
 
 ]

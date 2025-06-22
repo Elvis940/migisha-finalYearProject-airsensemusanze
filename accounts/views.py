@@ -10,8 +10,28 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
+import json
+from .models import SensorData
 
+@csrf_exempt
+def receive_sensor_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            aqi = data.get('aqi')
+            temperature = data.get('temperature')
+            humidity = data.get('humidity')
 
+            SensorData.objects.create(
+                aqi=aqi,
+                temperature=temperature,
+                humidity=humidity
+            )
+
+            return JsonResponse({'message': 'Data saved successfully!'}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid request'}, status=405)
 
 def login_view(request):
     if request.method == 'POST':

@@ -12,7 +12,7 @@ urlpatterns = [
     path('user/toggle-status/<int:user_id>/', views.toggle_user_status, name='toggle_user_status'),
     path('user/register/', views.register_user, name='register_user'),
     path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
-    path('api/latest-sensor-data/', views.latest_sensor_data, name='latest_sensor_data'),
+    path('api/sensordata/latest/', views.latest_sensor_data, name='latest_sensor_data'),
     path('api/sensordata/', views.receive_sensor_data, name='receive_sensor_data'),
 
 ]

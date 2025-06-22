@@ -13,5 +13,6 @@ urlpatterns = [
     path('user/register/', views.register_user, name='register_user'),
     path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
     path('api/sensordata/', views.receive_sensor_data, name='receive_sensor_data'),
+    path('api/latest-sensor-data/', views.latest_sensor_data, name='latest_sensor_data'),
 
 ]

@@ -375,14 +375,52 @@
             lastUpdated: new Date()
         };
 
-        function getAqiDetails(aqi) {
-            if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good', emoji: '😊', recommendation: "Air quality is great! It's a perfect day to be active outside." };
-            if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate', emoji: '🙂', recommendation: "Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities." };
-            if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive', emoji: '😷', recommendation: "Children, pregnant women, elderly, and those with conditions should limit prolonged outdoor exertion." };
-            if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy', emoji: '🤧', recommendation: "Everyone should reduce heavy outdoor exertion. Sensitive groups should avoid all outdoor activities." };
-            if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy', emoji: '🤢', recommendation: "Avoid all outdoor activity. Sensitive groups should stay indoors." };
-            return { level: 'Hazardous', colorClass: 'aqi-hazardous', emoji: '💀', recommendation: "DANGER! Remain indoors. Prolonged exposure can lead to serious health issues." };
-        }
+function getAqiDetails(aqi) {
+    if (aqi <= 50) {
+        return {
+            level: 'Good',
+            colorClass: 'aqi-good',
+            emoji: '😊',
+            recommendation: "Air quality is excellent. Safe for everyone, including children and pregnant women. Enjoy outdoor activities freely."
+        };
+    } else if (aqi <= 100) {
+        return {
+            level: 'Moderate',
+            colorClass: 'aqi-moderate',
+            emoji: '🙂',
+            recommendation: "Air quality is acceptable. Sensitive groups such as children, elderly, and pregnant women should limit prolonged outdoor exposure during heavy activities."
+        };
+    } else if (aqi <= 150) {
+        return {
+            level: 'Unhealthy for Sensitive Groups',
+            colorClass: 'aqi-unhealthy-sensitive',
+            emoji: '😷',
+            recommendation: "Children, pregnant women, elderly, and individuals with respiratory or heart conditions should reduce outdoor exertion. Consider wearing a mask when outdoors."
+        };
+    } else if (aqi <= 200) {
+        return {
+            level: 'Unhealthy',
+            colorClass: 'aqi-unhealthy',
+            emoji: '🤧',
+            recommendation: "Everyone may begin to experience health effects. Sensitive groups should stay indoors. Avoid heavy outdoor activities and wear a certified face mask if necessary to go outside."
+        };
+    } else if (aqi <= 300) {
+        return {
+            level: 'Very Unhealthy',
+            colorClass: 'aqi-very-unhealthy',
+            emoji: '🤢',
+            recommendation: "Health alert: children, pregnant women, and individuals with existing conditions must remain indoors. Everyone should avoid outdoor activity and use air purifiers if available."
+        };
+    } else {
+        return {
+            level: 'Hazardous',
+            colorClass: 'aqi-hazardous',
+            emoji: '💀',
+            recommendation: "Emergency conditions: everyone is at risk of serious health effects. Stay indoors, close windows, avoid physical exertion, and use face masks or air purifiers. Pregnant women and children must not go outside."
+        };
+    }
+}
+
 
         async function updateDashboard() {
     try {

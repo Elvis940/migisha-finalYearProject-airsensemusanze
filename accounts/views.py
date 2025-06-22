@@ -34,7 +34,16 @@ def receive_sensor_data(request):
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
-
+@csrf_exempt
+def historical_sensor_data(request):
+    if request.method == 'GET':
+        data = list(
+            SensorData.objects.all()
+            .order_by('-timestamp')[:50]  # You can adjust the number
+            .values('timestamp', 'aqi', 'temperature', 'humidity')
+        )
+        return JsonResponse({'success': True, 'data': data}, status=200)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=405)
 
 @csrf_exempt
 def latest_sensor_data(request):

@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AirSense Musanze</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --white: #ffffff;
+            --black: #1e293b;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: fadeIn 0.3s ease-out;
+    max-width: 400px;
+    word-wrap: break-word;
+}
+
+.alert-success {
+    background-color: #10b981;
+}
+
+.alert-error {
+    background-color: #ef4444;
+}
+
+.error-message {
+    color: #ef4444;
+    margin-top: 5px;
+    font-size: 0.85rem;
+}
+
+.is-invalid {
+    border-color: #ef4444 !important;
+}
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: var(--black);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .logo svg {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+        }
+        
+        .admin-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .welcome {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: var(--white);
+        }
+        
+        .btn-success:hover {
+            background-color: #0d9f6e;
+        }
+        
+        /* Main Content */
+        .content {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .dashboard-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 0.5rem;
+            flex-grow: 1;
+            min-width: 200px;
+            font-size: 0.95rem;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+            vertical-align: top;
+        }
+        
+        .dashboard-table th {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .dashboard-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-denied {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .status-inactive {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-view {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .btn-edit {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-deny {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        /* Text Ellipsis for long content */
+        .text-ellipsis {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+            display: inline-block;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            width: 95%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+          .password-wrapper {
+        position: relative;
+    }
+    
+    .with-icon {
+        padding-right: 40px; /* Make space for the eye icon */
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6b7280;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    
+    .toggle-password svg {
+        display: block;
+    }
+    
+    .toggle-password:hover {
+        color: #1e3a8a;
+    }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .modal-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 0.25rem;
+        }
+        
+        .close-btn:hover {
+            color: var(--black);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--black);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* User Details */
+        .user-details {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 1rem;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        .detail-value {
+            color: var(--black);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .dashboard-table th,
+            .dashboard-table td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .action-btn {
+                padding: 0.4rem;
+                font-size: 0.8rem;
+                min-width: 50px;
+            }
+            
+            .text-ellipsis {
+                max-width: 120px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .admin-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+             .password-input-container {
+        position: relative;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6b7280;
+    }
+    
+    .password-toggle svg {
+        display: block;
+    }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .dashboard-table th,
+            .dashboard-table td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .action-buttons {
+                flex-direction: row;
+                gap: 0.3rem;
+            }
+            
+            .action-btn {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.75rem;
+                min-width: auto;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 1rem auto;
+                padding: 1rem;
+            }
+            
+            .form-actions {
+                flex-direction: row;
+                gap: 0.75rem;
+            }
+            
+            .btn {
+                width: auto;
+            }
+            
+            .text-ellipsis {
+                max-width: 100px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .welcome {
+                display: none;
+            }
+            
+            .user-details {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .dashboard-table th,
+            .dashboard-table td {
+                padding: 0.4rem;
+                font-size: 0.8rem;
+            }
+            
+            .status-badge {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.4rem;
+            }
+            
+            .action-buttons {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 0.2rem;
+            }
+            
+            .action-btn {
+                flex-shrink: 0;
+            }
+            
+            .text-ellipsis {
+                max-width: 80px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .dashboard-table th,
+            .dashboard-table td {
+                padding: 0.3rem;
+                font-size: 0.75rem;
+            }
+            
+            .action-btn {
+                padding: 0.25rem 0.4rem;
+                font-size: 0.7rem;
+            }
+            
+            .text-ellipsis {
+                max-width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>AirSense Musanze</span>
+        </a>
+        <div class="admin-actions">
+            <span class="welcome">Welcome, {{ request.user.first_name }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="dashboard-header">
+            <h2>User Accounts</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
+                <button id="registerNewUser" class="btn btn-success">Register New User</button>
+            </div>
+        </div>
+
+        <!-- User Table -->
+        <div class="table-container">
+            <table class="dashboard-table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.id }}">
+                        <td><span class="text-ellipsis">{{ user.first_name }}</span></td>
+                        
+                        <td><span class="text-ellipsis">{{ user.last_name }}</span></td>
+                        <td><span class="text-ellipsis">{{ user.dob|date:"Y-m-d"|default:"-" }}</span></td>
+                        <td><span class="text-ellipsis">{{ user.phone_number|default:"-" }}</span></td>
+                        <td><span class="text-ellipsis">{{ user.email }}</span></td>
+                        <td><span class="text-ellipsis">{{ user.get_role_display }}</span></td>
+                        <td><span class="status-badge status-{{ user.status }}">{{ user.get_status_display }}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-view" onclick="viewUser({{ user.id }})">View</button>
+                                <button class="action-btn btn-edit" onclick="editUser({{ user.id }})">Edit</button>
+                                <button class="action-btn btn-delete" onclick="confirmDelete({{ user.id }})">Delete</button>
+                                <button class="action-btn btn-deny" onclick="toggleStatus({{ user.id }})">
+                                    {% if user.status == 'denied' %}Grant{% else %}Deny{% endif %}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- View User Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">User Details</h3>
+                <button class="close-btn" onclick="closeModal('viewModal')">&times;</button>
+            </div>
+            <div id="userDetails" class="user-details"></div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('viewModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+   <!-- Edit User Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit User</h3>
+            <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
+        </div>
+        <form id="editUserForm">
+            <input type="hidden" id="editUserId" name="id">
+            <div class="form-group">
+                <label for="editUsername" class="form-label">Username</label>
+                <input type="text" id="editUsername" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editFirstName" class="form-label">First Name</label>
+                <input type="text" id="editFirstName" name="first_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editLastName" class="form-label">Last Name</label>
+                <input type="text" id="editLastName" name="last_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editDob" class="form-label">Date of Birth</label>
+                <input type="date" id="editDob" name="dob" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="editPhone" class="form-label">Phone Number</label>
+                <input type="text" id="editPhone" name="phone_number" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editEmail" class="form-label">Email</label>
+                <input type="email" id="editEmail" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editRole" class="form-label">Role</label>
+                <select id="editRole" name="role" class="form-control form-select" required>
+                    <option value="admin">Admin</option>
+                    <option value="city_planner">City Planner</option>
+                    <option value="research">Research</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editStatus" class="form-label">Status</label>
+                <input type="text" id="editStatusDisplay" class="form-control" readonly>
+                <input type="hidden" id="editStatus" name="status">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+ <!-- Register User Modal -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Register New User</h3>
+            <button class="close-btn" onclick="closeModal('registerModal')">&times;</button>
+        </div>
+        <form id="registerUserForm">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="pending">
+            <div class="form-group">
+                <label for="regUsername" class="form-label">Username</label>
+                <input type="text" id="regUsername" placeholder="Username" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="regFirstName" class="form-label">First Name</label>
+                <input type="text" id="regFirstName" name="first_name" placeholder="First Name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="regLastName" class="form-label">Last Name</label>
+                <input type="text" id="regLastName" name="last_name" placeholder="Last Name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="regDob" class="form-label">Date of Birth</label>
+                <input type="date" id="regDob" name="dob" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="regPhone" class="form-label">Phone Number</label>
+                <input type="text" id="regPhone" name="phone_number" placeholder="+250782457017" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="regEmail" class="form-label">Email</label>
+                <input type="email" id="regEmail" name="email" placeholder="elyseemigi@gmail.com" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="regRole" class="form-label">Role</label>
+                <select id="regRole" name="role" class="form-control form-select" required>
+                    <option value="city_planner">City Planner</option>
+                    <option value="research">Research</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="regPassword" class="form-label">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="regPassword" name="password" class="form-control with-icon" required minlength="8">
+                    <span class="toggle-password" onclick="togglePasswordVisibility('regPassword', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </span>
+                </div>
+                <small class="form-text">Password must be at least 8 characters long.</small>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('registerModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Register User</button>
+            </div>
+        </form>
+    </div>
+</div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Deletion</h3>
+                <button class="close-btn" onclick="closeModal('deleteModal')">&times;</button>
+            </div>
+            <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete User</button>
+            </div>
+        </div>
+    </div>
+
+  <script>
+   function togglePasswordVisibility(inputId, toggleElement) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = toggleElement.querySelector('svg');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+    }
+    
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#userTable tbody tr');
+        
+        rows.forEach(row => {
+            const firstName = row.cells[0].textContent.toLowerCase();
+            const lastName = row.cells[1].textContent.toLowerCase();
+            const phone = row.cells[3].textContent.toLowerCase();
+            const email = row.cells[4].textContent.toLowerCase();
+            
+            if (firstName.includes(filter) || lastName.includes(filter) || 
+                phone.includes(filter) || email.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Modal functions
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+            event.target.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    // View user details
+    function viewUser(userId) {
+        fetch(`/accounts/user/${userId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const userDetails = document.getElementById('userDetails');
+                userDetails.innerHTML = `
+                    <span class="detail-label">First Name:</span>
+                    <span class="detail-value">${data.first_name || '-'}</span>
+                    <span class="detail-label">Last Name:</span>
+                    <span class="detail-value">${data.last_name || '-'}</span>
+                    <span class="detail-label">Date of Birth:</span>
+                    <span class="detail-value">${data.dob || '-'}</span>
+                    <span class="detail-label">Phone Number:</span>
+                    <span class="detail-value">${data.phone_number || '-'}</span>
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${data.email || '-'}</span>
+                    <span class="detail-label">Role:</span>
+                    <span class="detail-value">${data.role_display || data.role || '-'}</span>
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value">${data.status_display || data.status || '-'}</span>
+                `;
+                openModal('viewModal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('error', 'Error loading user details: ' + error.message);
+            });
+    }
+
+  // Edit user
+function editUser(userId) {
+    fetch(`/accounts/user/${userId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUsername').value = data.username ||'';
+            document.getElementById('editFirstName').value = data.first_name || '';
+            document.getElementById('editLastName').value = data.last_name || '';
+            document.getElementById('editDob').value = data.dob || '';
+            document.getElementById('editPhone').value = data.phone_number || '';
+            document.getElementById('editEmail').value = data.email || '';
+            document.getElementById('editRole').value = data.role || 'city_planner';
+            
+            // Update status display (read-only)
+            const statusDisplay = {
+                'pending': 'Pending',
+                'active': 'Active',
+                'inactive': 'Inactive',
+                'denied': 'Denied'
+            };
+            document.getElementById('editStatusDisplay').value = statusDisplay[data.status] || 'Pending';
+            document.getElementById('editStatus').value = data.status || 'pending';
+            
+            openModal('editModal');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('error', 'Error loading user data for editing: ' + error.message);
+        });
+}
+   document.getElementById('editUserForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const userId = document.getElementById('editUserId').value;
+    const formData = new FormData(this);
+    
+    // Add CSRF token
+    const csrfToken = getCookie('csrftoken');
+    formData.append('csrfmiddlewaretoken', csrfToken);
+    
+    fetch(`/accounts/user/edit/${userId}/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrfToken,
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            return response.json().then(errData => {
+                throw new Error(errData.message || `Server responded with ${response.status}`);
+            }).catch(() => {
+                throw new Error(`Server responded with ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update the UI
+            const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+            if (row) {
+                row.cells[0].textContent = document.getElementById('editUsername').value;
+                row.cells[0].textContent = document.getElementById('editFirstName').value;
+                row.cells[1].textContent = document.getElementById('editLastName').value;
+                row.cells[2].textContent = document.getElementById('editDob').value || '-';
+                row.cells[3].textContent = document.getElementById('editPhone').value;
+                row.cells[4].textContent = document.getElementById('editEmail').value;
+                row.cells[5].textContent = document.getElementById('editRole').options[document.getElementById('editRole').selectedIndex].text;
+                
+                // Update status badge (using the hidden field value)
+                const newStatus = document.getElementById('editStatus').value;
+                const statusDisplay = {
+                    'pending': 'Pending',
+                    'active': 'Active',
+                    'inactive': 'Inactive',
+                    'denied': 'Denied'
+                };
+                row.cells[6].innerHTML = `<span class="status-badge status-${newStatus}">
+                    ${statusDisplay[newStatus] || 'Pending'}
+                </span>`;
+                
+                // Update toggle button
+                const toggleButton = row.querySelector('.btn-deny, .btn-grant');
+                if (toggleButton) {
+                    toggleButton.textContent = newStatus === 'denied' ? 'Grant' : 'Deny';
+                    toggleButton.className = `action-btn ${newStatus === 'denied' ? 'btn-grant' : 'btn-deny'}`;
+                }
+            }
+            closeModal('editModal');
+            showAlert('success', 'User updated successfully!');
+        } else {
+            showFormErrors(data.errors || { _general: [data.message || 'An error occurred'] });
+        }
+    })
+    .catch(error => {
+        console.error('Full error:', error);
+        showAlert('error', 'Error updating user: ' + error.message);
+    });
+});
+    // Register new user
+    document.getElementById('registerNewUser').addEventListener('click', function() {
+        // Reset form and open modal
+        document.getElementById('registerUserForm').reset();
+        openModal('registerModal');
+    });
+
+    // Registration form submission
+    document.getElementById('registerUserForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Registering...';
+        
+        fetch('/accounts/user/register/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Show success message and close modal
+                closeModal('registerModal');
+                showAlert('success', 'User registered successfully!');
+                
+                // Refresh the page after a short delay
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                // Show error messages
+                let errorMessage = 'Error registering user:';
+                if (data.errors) {
+                    for (const field in data.errors) {
+                        const errors = Array.isArray(data.errors[field]) ? 
+                            data.errors[field] : 
+                            data.errors[field].map(error => error.message);
+                        errorMessage += `\n- ${field}: ${errors.join(', ')}`;
+                    }
+                } else {
+                    errorMessage += '\nUnknown error occurred';
+                }
+                showAlert('error', errorMessage);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('error', 'An error occurred while registering the user: ' + error.message);
+        })
+        .finally(() => {
+            // Restore button state
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        });
+    });
+
+    // Delete user
+    let currentUserIdToDelete = null;
+
+    function confirmDelete(userId) {
+        currentUserIdToDelete = userId;
+        openModal('deleteModal');
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (currentUserIdToDelete) {
+            // Show loading state
+            const deleteBtn = this;
+            const originalText = deleteBtn.textContent;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = 'Deleting...';
+            
+            fetch(`/accounts/user/delete/${currentUserIdToDelete}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    closeModal('deleteModal');
+                    showAlert('success', 'User deleted successfully!');
+                    // Remove the row from the table
+                    const row = document.querySelector(`tr[data-user-id="${currentUserIdToDelete}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                } else {
+                    showAlert('error', data.message || 'Error deleting user');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('error', 'Error deleting user: ' + error.message);
+            })
+            .finally(() => {
+                // Restore button state
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = originalText;
+                currentUserIdToDelete = null;
+            });
+        }
+    });
+
+    // Toggle user status
+    function toggleStatus(userId) {
+        const button = document.querySelector(`tr[data-user-id="${userId}"] .btn-deny, tr[data-user-id="${userId}"] .btn-grant`);
+        if (!button) return;
+        
+        // Show loading state
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Processing...';
+        
+        fetch(`/accounts/user/toggle-status/${userId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the UI
+                const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+                if (row) {
+                    // Update status display
+                    const statusCell = row.cells[6];
+                    statusCell.innerHTML = `<span class="status-badge status-${data.new_status}">
+                        ${data.new_status_display || data.new_status.charAt(0).toUpperCase() + data.new_status.slice(1)}
+                    </span>`;
+                    
+                    // Update toggle button
+                    button.textContent = data.button_text;
+                    button.className = `action-btn ${data.button_text === 'Grant' ? 'btn-grant' : 'btn-deny'}`;
+                }
+                showAlert('success', 'User status updated successfully!');
+            } else {
+                showAlert('error', data.message || 'Failed to update status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('error', 'An error occurred while updating status: ' + error.message);
+        })
+        .finally(() => {
+            // Restore button state
+            button.disabled = false;
+            if (originalText) {
+                button.textContent = originalText;
+            }
+        });
+    }
+
+    // Helper function to show alerts
+    function showAlert(type, message) {
+        // Remove any existing alerts first
+        const existingAlerts = document.querySelectorAll('.custom-alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `custom-alert alert-${type}`;
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.padding = '15px 20px';
+        alertDiv.style.borderRadius = '5px';
+        alertDiv.style.color = 'white';
+        alertDiv.style.zIndex = '1000';
+        alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        alertDiv.style.animation = 'fadeIn 0.3s ease-out';
+        alertDiv.style.maxWidth = '400px';
+        alertDiv.style.wordWrap = 'break-word';
+        
+        if (type === 'success') {
+            alertDiv.style.backgroundColor = '#10b981';
+        } else if (type === 'error') {
+            alertDiv.style.backgroundColor = '#ef4444';
+        } else {
+            alertDiv.style.backgroundColor = '#3b82f6';
+        }
+        
+        alertDiv.textContent = message;
+        document.body.appendChild(alertDiv);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            alertDiv.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    document.body.removeChild(alertDiv);
+                }
+            }, 300);
+        }, 5000);
+    }
+
+    // Helper function to show form errors
+    function showFormErrors(errors) {
+        // Clear previous errors
+        document.querySelectorAll('.error-message').forEach(el => el.remove());
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+        
+        // Show new errors
+        for (const [field, messages] of Object.entries(errors)) {
+            const input = document.querySelector(`[name="${field}"]`);
+            if (input) {
+                input.classList.add('is-invalid');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.style.color = '#ef4444';
+                errorDiv.style.marginTop = '5px';
+                errorDiv.style.fontSize = '0.85rem';
+                errorDiv.textContent = Array.isArray(messages) ? messages.join(', ') : messages;
+                input.parentNode.appendChild(errorDiv);
+            }
+        }
+    }
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+</body>
+</html>

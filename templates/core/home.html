@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>AirSense Musanze</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            color: #1e3a8a;
+        }
+
+        .logo svg {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .contact-link {
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .contact-link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .nav-button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            text-decoration: none;
+        }
+
+        .nav-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Main Content */
+        main {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .aqi-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .aqi-card {
+            color: white;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .aqi-label {
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .aqi-value {
+            font-size: clamp(3rem, 15vw, 5rem);
+            font-weight: bold;
+            margin: 1rem 0;
+            line-height: 1;
+        }
+
+        .aqi-status {
+            font-size: clamp(1rem, 5vw, 1.5rem);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .aqi-update {
+            font-size: clamp(0.7rem, 3vw, 0.9rem);
+            opacity: 0.8;
+        }
+
+        .metrics-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .metric-card {
+            flex: 1 1 200px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0;
+        }
+
+        .metric-card svg {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .metric-value {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+            font-weight: bold;
+        }
+
+        .metric-label {
+            font-size: clamp(0.7rem, 3vw, 0.9rem);
+            opacity: 0.8;
+        }
+
+        .recommendation-card {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        .recommendation-emoji {
+            font-size: clamp(2rem, 8vw, 3rem);
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1e293b;
+            color: white;
+            padding: 1rem;
+            font-size: clamp(0.7rem, 3vw, 0.9rem);
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-content a {
+            color: #93c5fd;
+            text-decoration: none;
+        }
+
+        .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* AQI Colors */
+        .aqi-good { background-color: #10b981; }
+        .aqi-moderate { background-color: #f59e0b; }
+        .aqi-unhealthy-sensitive { background-color: #f97316; }
+        .aqi-unhealthy { background-color: #ef4444; }
+        .aqi-very-unhealthy { background-color: #8b5cf6; }
+        .aqi-hazardous { background-color: #7f1d1d; }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .metrics-row {
+                flex-direction: column;
+            }
+
+            .metric-card {
+                flex: 1 1 auto;
+            }
+
+            .recommendation-card > div {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .recommendation-emoji {
+                margin-bottom: 1rem;
+            }
+
+            .header-nav {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0.75rem;
+            }
+
+            .contact-link {
+                display: none; /* Hide on very small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>AirSense Musanze</span>
+        </div>
+        <div class="header-nav">
+            <a href="#contact" class="contact-link">Contact for Access</a>
+            <a href="{% url 'login' %}" class="nav-button">
+                Login
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="aqi-container">
+            <!-- AQI Card -->
+            <div class="card aqi-card" id="aqi-card">
+                <p class="aqi-label">Musanze District AQI</p>
+                <div class="aqi-value" id="aqi-value">78</div>
+                <p class="aqi-status" id="aqi-status">Moderate</p>
+                <p class="aqi-update" id="aqi-update">Last updated: 10:45 AM</p>
+            </div>
+
+            <!-- Temperature & Humidity Row -->
+            <div class="metrics-row">
+                <!-- Temperature Card -->
+                <div class="card metric-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="metric-label">Temperature</p>
+                        <p class="metric-value" id="temperature">22°C</p>
+                    </div>
+                </div>
+
+                <!-- Humidity Card -->
+                <div class="card metric-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="metric-label">Humidity</p>
+                        <p class="metric-value" id="humidity">65%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="card recommendation-card">
+            <h3>What should I do?</h3>
+            <div style="display: flex; align-items: center;">
+                <div class="recommendation-emoji" id="recommendation-emoji">🙂</div>
+                <p id="recommendation-text">Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <h3>Request Data Access</h3>
+            <p>For researchers and city planners, send a request to:</p>
+            <p><a href="mailto:airsensemail@gmail.com">airsensemail@gmail.com</a></p>
+            <p>We review all requests within 10 business days.</p>
+            <p>&copy; 2024 AirSense Musanze. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const aqiData = {
+            aqi: 78,
+            temperature: 22,
+            humidity: 65,
+            lastUpdated: new Date()
+        };
+
+        function getAqiDetails(aqi) {
+            if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good', emoji: '😊', recommendation: "Air quality is great! It's a perfect day to be active outside." };
+            if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate', emoji: '🙂', recommendation: "Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities." };
+            if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive', emoji: '😷', recommendation: "Children, pregnant women, elderly, and those with conditions should limit prolonged outdoor exertion." };
+            if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy', emoji: '🤧', recommendation: "Everyone should reduce heavy outdoor exertion. Sensitive groups should avoid all outdoor activities." };
+            if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy', emoji: '🤢', recommendation: "Avoid all outdoor activity. Sensitive groups should stay indoors." };
+            return { level: 'Hazardous', colorClass: 'aqi-hazardous', emoji: '💀', recommendation: "DANGER! Remain indoors. Prolonged exposure can lead to serious health issues." };
+        }
+
+        function updateDashboard() {
+            const aqiDetails = getAqiDetails(aqiData.aqi);
+            const aqiCard = document.getElementById('aqi-card');
+            aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
+            document.getElementById('aqi-value').textContent = aqiData.aqi;
+            document.getElementById('aqi-status').textContent = aqiDetails.level;
+            document.getElementById('aqi-update').textContent = `Last updated: ${aqiData.lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            document.getElementById('temperature').textContent = `${aqiData.temperature}°C`;
+            document.getElementById('humidity').textContent = `${aqiData.humidity}%`;
+            document.getElementById('recommendation-emoji').textContent = aqiDetails.emoji;
+            document.getElementById('recommendation-text').textContent = aqiDetails.recommendation;
+        }
+
+        function simulateDataUpdate() {
+            aqiData.aqi = Math.floor(Math.random() * (160 - 30 + 1)) + 30;
+            aqiData.temperature = Math.floor(Math.random() * (25 - 18 + 1)) + 18;
+            aqiData.humidity = Math.floor(Math.random() * (85 - 55 + 1)) + 55;
+            aqiData.lastUpdated = new Date();
+            updateDashboard();
+        }
+
+        // Smooth scroll for contact link
+        document.querySelector('a[href="#contact"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('contact').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // Initialize
+        updateDashboard();
+        setInterval(simulateDataUpdate, 15000);
+    </script>
+</body>
+</html>

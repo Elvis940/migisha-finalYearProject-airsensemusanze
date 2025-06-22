@@ -2,15 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
-
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.http import JsonResponse
 from airsense_project.settings import DEFAULT_FROM_EMAIL
 from .models import CustomUser
 from .forms import CustomUserForm
-from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
-import json
 from .models import SensorData
 
 @csrf_exempt
@@ -34,11 +34,10 @@ def receive_sensor_data(request):
     return JsonResponse({'error': 'Invalid request'}, status=405)
 
 from django.http import JsonResponse
-from .models import SensorData
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-def get_latest_sensor_data(request):
+def latest_sensor_data(request):
     try:
         # Get the latest sensor data entry
         latest_data = SensorData.objects.latest('timestamp')

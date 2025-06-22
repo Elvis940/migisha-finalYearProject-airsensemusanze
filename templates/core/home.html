@@ -286,9 +286,9 @@
             <!-- AQI Card -->
             <div class="card aqi-card" id="aqi-card">
                 <p class="aqi-label">Musanze District AQI</p>
-                <div class="aqi-value" id="aqi-value">78</div>
-                <p class="aqi-status" id="aqi-status">Moderate</p>
-                <p class="aqi-update" id="aqi-update">Last updated: 10:45 AM</p>
+                <div class="aqi-value" id="aqi-value">--</div>
+                <p class="aqi-status" id="aqi-status">Loading...</p>
+                <p class="aqi-update" id="aqi-update">Last updated: --</p>
             </div>
 
             <!-- Temperature & Humidity Row -->
@@ -300,7 +300,7 @@
                     </svg>
                     <div>
                         <p class="metric-label">Temperature</p>
-                        <p class="metric-value" id="temperature">22°C</p>
+                        <p class="metric-value" id="temperature">--°C</p>
                     </div>
                 </div>
 
@@ -311,7 +311,7 @@
                     </svg>
                     <div>
                         <p class="metric-label">Humidity</p>
-                        <p class="metric-value" id="humidity">65%</p>
+                        <p class="metric-value" id="humidity">--%</p>
                     </div>
                 </div>
             </div>
@@ -321,8 +321,8 @@
         <div class="card recommendation-card">
             <h3>What should I do?</h3>
             <div style="display: flex; align-items: center;">
-                <div class="recommendation-emoji" id="recommendation-emoji">🙂</div>
-                <p id="recommendation-text">Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities.</p>
+                <div class="recommendation-emoji" id="recommendation-emoji">⏳</div>
+                <p id="recommendation-text">Loading air quality recommendations...</p>
             </div>
         </div>
     </main>
@@ -333,82 +333,98 @@
             <p>For researchers and city planners, send a request to:</p>
             <p><a href="mailto:airsensemail@gmail.com">airsensemail@gmail.com</a></p>
             <p>We review all requests within 10 business days.</p>
-            <p>&copy; 2024 AirSense Musanze. All rights reserved.</p>
+            <p>&copy; <span id="current-year"></span> AirSense Musanze. All rights reserved.</p>
         </div>
     </footer>
- <script>
-    // Function to fetch latest data from server
-    async function fetchLatestData() {
-        try {
-            const response = await fetch('/api/latest-sensor-data/');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+
+    <script>
+        // Function to fetch latest data from server
+        async function fetchLatestData() {
+            try {
+                const response = await fetch('/api/latest-sensor-data/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.data;
+                } else {
+                    console.error('Failed to fetch sensor data:', data.message);
+                    return getDefaultData();
+                }
+            } catch (error) {
+                console.error('Error fetching sensor data:', error);
+                return getDefaultData();
             }
-            const data = await response.json();
-            
-            if (data.success) {
-                return data.data;
-            } else {
-                console.error('Failed to fetch sensor data:', data.message);
-                return null;
-            }
-        } catch (error) {
-            console.error('Error fetching sensor data:', error);
-            return null;
         }
-    }
 
-    const aqiData = {
-        aqi: 0,
-        temperature: 0,
-        humidity: 0,
-        lastUpdated: new Date()
-    };
+        function getDefaultData() {
+            return {
+                aqi: 0,
+                temperature: 0,
+                humidity: 0,
+                timestamp: new Date().toISOString()
+            };
+        }
 
-    function getAqiDetails(aqi) {
-        if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good', emoji: '😊', recommendation: "Air quality is great! It's a perfect day to be active outside." };
-        if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate', emoji: '🙂', recommendation: "Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities." };
-        if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive', emoji: '😷', recommendation: "Children, pregnant women, elderly, and those with conditions should limit prolonged outdoor exertion." };
-        if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy', emoji: '🤧', recommendation: "Everyone should reduce heavy outdoor exertion. Sensitive groups should avoid all outdoor activities." };
-        if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy', emoji: '🤢', recommendation: "Avoid all outdoor activity. Sensitive groups should stay indoors." };
-        return { level: 'Hazardous', colorClass: 'aqi-hazardous', emoji: '💀', recommendation: "DANGER! Remain indoors. Prolonged exposure can lead to serious health issues." };
-    }
+        const aqiData = {
+            aqi: 0,
+            temperature: 0,
+            humidity: 0,
+            lastUpdated: new Date()
+        };
 
-    async function updateDashboard() {
-    const latestData = await fetchLatestData();
-    
-    if (latestData) {
-        aqiData.aqi = latestData.aqi;
-        aqiData.temperature = latestData.temperature;
-        aqiData.humidity = latestData.humidity;
-        aqiData.lastUpdated = new Date(latestData.timestamp);
+        function getAqiDetails(aqi) {
+            if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good', emoji: '😊', recommendation: "Air quality is great! It's a perfect day to be active outside." };
+            if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate', emoji: '🙂', recommendation: "Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities." };
+            if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive', emoji: '😷', recommendation: "Children, pregnant women, elderly, and those with conditions should limit prolonged outdoor exertion." };
+            if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy', emoji: '🤧', recommendation: "Everyone should reduce heavy outdoor exertion. Sensitive groups should avoid all outdoor activities." };
+            if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy', emoji: '🤢', recommendation: "Avoid all outdoor activity. Sensitive groups should stay indoors." };
+            return { level: 'Hazardous', colorClass: 'aqi-hazardous', emoji: '💀', recommendation: "DANGER! Remain indoors. Prolonged exposure can lead to serious health issues." };
+        }
+
+        async function updateDashboard() {
+    try {
+        const latestData = await fetchLatestData();
+        
+        if (latestData) {
+            aqiData.aqi = latestData.aqi;
+            aqiData.temperature = latestData.temperature;
+            aqiData.humidity = latestData.humidity;
+            aqiData.lastUpdated = new Date(latestData.timestamp);
+        }
+        
+        const aqiDetails = getAqiDetails(aqiData.aqi);
+        const aqiCard = document.getElementById('aqi-card');
+        aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
+        document.getElementById('aqi-value').textContent = Math.round(aqiData.aqi);
+        document.getElementById('aqi-status').textContent = aqiDetails.level;
+        document.getElementById('aqi-update').textContent = `Last updated: ${aqiData.lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        document.getElementById('temperature').textContent = `${Math.round(aqiData.temperature)}°C`;
+        document.getElementById('humidity').textContent = `${Math.round(aqiData.humidity)}%`;
+        document.getElementById('recommendation-emoji').textContent = aqiDetails.emoji;
+        document.getElementById('recommendation-text').textContent = aqiDetails.recommendation;
+    } catch (error) {
+        console.error('Error updating dashboard:', error);
     }
-    
-    const aqiDetails = getAqiDetails(aqiData.aqi);
-    const aqiCard = document.getElementById('aqi-card');
-    aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
-    document.getElementById('aqi-value').textContent = Math.round(aqiData.aqi);
-    document.getElementById('aqi-status').textContent = aqiDetails.level;
-    document.getElementById('aqi-update').textContent = `Last updated: ${aqiData.lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-    document.getElementById('temperature').textContent = `${Math.round(aqiData.temperature)}°C`;
-    document.getElementById('humidity').textContent = `${Math.round(aqiData.humidity)}%`;
-    document.getElementById('recommendation-emoji').textContent = aqiDetails.emoji;
-    document.getElementById('recommendation-text').textContent = aqiDetails.recommendation;
 }
-
-
-    // Smooth scroll for contact link
-    document.querySelector('a[href="#contact"]').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('contact').scrollIntoView({
-            behavior: 'smooth'
+        // Smooth scroll for contact link
+        document.querySelector('a[href="#contact"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('contact').scrollIntoView({
+                behavior: 'smooth'
+            });
         });
-    });
 
-    // Initialize and update every 15 seconds
-    updateDashboard();
-    setInterval(updateDashboard, 15000);
-</script>
-  
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Initialize and update every 15 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            setInterval(updateDashboard, 15000);
+        });
+    </script>
 </body>
 </html>

@@ -33,6 +33,33 @@ def receive_sensor_data(request):
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request'}, status=405)
 
+from django.http import JsonResponse
+from .models import SensorData
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+def get_latest_sensor_data(request):
+    try:
+        # Get the latest sensor data entry
+        latest_data = SensorData.objects.latest('timestamp')
+        
+        data = {
+            'aqi': latest_data.aqi,
+            'temperature': latest_data.temperature,
+            'humidity': latest_data.humidity,
+            'timestamp': latest_data.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        return JsonResponse({
+            'success': True,
+            'data': data
+        })
+    except SensorData.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'No sensor data available'
+        }, status=404)
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')

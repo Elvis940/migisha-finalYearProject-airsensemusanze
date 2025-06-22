@@ -336,56 +336,79 @@
             <p>&copy; 2024 AirSense Musanze. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        const aqiData = {
-            aqi: 78,
-            temperature: 22,
-            humidity: 65,
-            lastUpdated: new Date()
-        };
-
-        function getAqiDetails(aqi) {
-            if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good', emoji: '😊', recommendation: "Air quality is great! It's a perfect day to be active outside." };
-            if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate', emoji: '🙂', recommendation: "Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities." };
-            if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive', emoji: '😷', recommendation: "Children, pregnant women, elderly, and those with conditions should limit prolonged outdoor exertion." };
-            if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy', emoji: '🤧', recommendation: "Everyone should reduce heavy outdoor exertion. Sensitive groups should avoid all outdoor activities." };
-            if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy', emoji: '🤢', recommendation: "Avoid all outdoor activity. Sensitive groups should stay indoors." };
-            return { level: 'Hazardous', colorClass: 'aqi-hazardous', emoji: '💀', recommendation: "DANGER! Remain indoors. Prolonged exposure can lead to serious health issues." };
+ <script>
+    // Function to fetch latest data from server
+    async function fetchLatestData() {
+        try {
+            const response = await fetch('/api/latest-sensor-data/');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data;
+            } else {
+                console.error('Failed to fetch sensor data:', data.message);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching sensor data:', error);
+            return null;
         }
+    }
 
-        function updateDashboard() {
-            const aqiDetails = getAqiDetails(aqiData.aqi);
-            const aqiCard = document.getElementById('aqi-card');
-            aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
-            document.getElementById('aqi-value').textContent = aqiData.aqi;
-            document.getElementById('aqi-status').textContent = aqiDetails.level;
-            document.getElementById('aqi-update').textContent = `Last updated: ${aqiData.lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-            document.getElementById('temperature').textContent = `${aqiData.temperature}°C`;
-            document.getElementById('humidity').textContent = `${aqiData.humidity}%`;
-            document.getElementById('recommendation-emoji').textContent = aqiDetails.emoji;
-            document.getElementById('recommendation-text').textContent = aqiDetails.recommendation;
-        }
+    const aqiData = {
+        aqi: 0,
+        temperature: 0,
+        humidity: 0,
+        lastUpdated: new Date()
+    };
 
-        function simulateDataUpdate() {
-            aqiData.aqi = Math.floor(Math.random() * (160 - 30 + 1)) + 30;
-            aqiData.temperature = Math.floor(Math.random() * (25 - 18 + 1)) + 18;
-            aqiData.humidity = Math.floor(Math.random() * (85 - 55 + 1)) + 55;
-            aqiData.lastUpdated = new Date();
-            updateDashboard();
-        }
+    function getAqiDetails(aqi) {
+        if (aqi <= 50) return { level: 'Good', colorClass: 'aqi-good', emoji: '😊', recommendation: "Air quality is great! It's a perfect day to be active outside." };
+        if (aqi <= 100) return { level: 'Moderate', colorClass: 'aqi-moderate', emoji: '🙂', recommendation: "Air quality is acceptable. For highly sensitive people, consider reducing intense outdoor activities." };
+        if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', colorClass: 'aqi-unhealthy-sensitive', emoji: '😷', recommendation: "Children, pregnant women, elderly, and those with conditions should limit prolonged outdoor exertion." };
+        if (aqi <= 200) return { level: 'Unhealthy', colorClass: 'aqi-unhealthy', emoji: '🤧', recommendation: "Everyone should reduce heavy outdoor exertion. Sensitive groups should avoid all outdoor activities." };
+        if (aqi <= 300) return { level: 'Very Unhealthy', colorClass: 'aqi-very-unhealthy', emoji: '🤢', recommendation: "Avoid all outdoor activity. Sensitive groups should stay indoors." };
+        return { level: 'Hazardous', colorClass: 'aqi-hazardous', emoji: '💀', recommendation: "DANGER! Remain indoors. Prolonged exposure can lead to serious health issues." };
+    }
 
-        // Smooth scroll for contact link
-        document.querySelector('a[href="#contact"]').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('contact').scrollIntoView({
-                behavior: 'smooth'
-            });
+    async function updateDashboard() {
+    const latestData = await fetchLatestData();
+    
+    if (latestData) {
+        aqiData.aqi = latestData.aqi;
+        aqiData.temperature = latestData.temperature;
+        aqiData.humidity = latestData.humidity;
+        aqiData.lastUpdated = new Date(latestData.timestamp);
+    }
+    
+    const aqiDetails = getAqiDetails(aqiData.aqi);
+    const aqiCard = document.getElementById('aqi-card');
+    aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
+    document.getElementById('aqi-value').textContent = Math.round(aqiData.aqi);
+    document.getElementById('aqi-status').textContent = aqiDetails.level;
+    document.getElementById('aqi-update').textContent = `Last updated: ${aqiData.lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    document.getElementById('temperature').textContent = `${Math.round(aqiData.temperature)}°C`;
+    document.getElementById('humidity').textContent = `${Math.round(aqiData.humidity)}%`;
+    document.getElementById('recommendation-emoji').textContent = aqiDetails.emoji;
+    document.getElementById('recommendation-text').textContent = aqiDetails.recommendation;
+}
+
+
+    // Smooth scroll for contact link
+    document.querySelector('a[href="#contact"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('contact').scrollIntoView({
+            behavior: 'smooth'
         });
+    });
 
-        // Initialize
-        updateDashboard();
-        setInterval(simulateDataUpdate, 15000);
-    </script>
+    // Initialize and update every 15 seconds
+    updateDashboard();
+    setInterval(updateDashboard, 15000);
+</script>
+  
 </body>
 </html>

@@ -2,15 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.http import JsonResponse
+from django.utils import timezone
+
 from airsense_project.settings import DEFAULT_FROM_EMAIL
 from .models import CustomUser
 from .forms import CustomUserForm
+from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
+import json
 from .models import SensorData
 
 @csrf_exempt
@@ -28,37 +29,45 @@ def receive_sensor_data(request):
                 humidity=humidity
             )
 
-            return JsonResponse({'message': 'Data saved successfully!'}, status=201)
+            return JsonResponse({'success': True, 'message': 'Data saved successfully!'}, status=201)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    return JsonResponse({'error': 'Invalid request'}, status=405)
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
 
+
+@csrf_exempt
 def latest_sensor_data(request):
-    try:
-        # Get the latest sensor data entry
-        latest_data = SensorData.objects.latest('timestamp')
-        
-        data = {
-            'aqi': latest_data.aqi,
-            'temperature': latest_data.temperature,
-            'humidity': latest_data.humidity,
-            'timestamp': latest_data.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        return JsonResponse({
-            'success': True,
-            'data': data
-        })
-    except SensorData.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'No sensor data available'
-        }, status=404)
-
+    if request.method == 'GET':
+        try:
+            # Get the latest sensor data entry
+            latest_data = SensorData.objects.latest('timestamp')
+            
+            data = {
+                'success': True,
+                'data': {
+                    'aqi': latest_data.aqi,
+                    'temperature': latest_data.temperature,
+                    'humidity': latest_data.humidity,
+                    'timestamp': latest_data.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                }
+            }
+            return JsonResponse(data)
+        except SensorData.DoesNotExist:
+            # Return default values if no data exists
+            return JsonResponse({
+                'success': True,
+                'data': {
+                    'aqi': 0,
+                    'temperature': 0,
+                    'humidity': 0,
+                    'timestamp': timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+            })
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    }, status=405)
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')

@@ -199,6 +199,7 @@
         .chart-container {
             width: 100%;
             height: calc(100% - 30px);
+            position: relative;
         }
 
         .chart-tabs {
@@ -218,24 +219,6 @@
         .chart-tab.active {
             color: #1e3a8a;
             border-bottom-color: #1e3a8a;
-        }
-
-        /* User Info Section */
-        .user-info {
-            margin-top: 2rem;
-        }
-
-        .user-info-card {
-            padding: 1.5rem;
-        }
-
-        .user-info-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .user-info-item strong {
-            display: inline-block;
-            width: 80px;
         }
 
         /* Footer */
@@ -382,316 +365,341 @@
     </footer>
 
     <script>
-       // Set current year in footer
-document.getElementById('current-year').textContent = new Date().getFullYear();
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
 
-// Chart variables
-let dataChart;
-let historicalData = {
-    aqi: [],
-    temperature: [],
-    humidity: [],
-    timestamps: []
-};
+        // Chart variables
+        let dataChart;
+        let historicalData = {
+            aqi: [],
+            temperature: [],
+            humidity: [],
+            timestamps: []
+        };
 
-// Function to fetch latest data from server
-async function fetchLatestData() {
-    try {
-        const response = await fetch('/accounts/api/sensordata/latest/');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        
-        if (data.success) {
-            return data.data;
-        } else {
-            console.error('Failed to fetch sensor data:', data.message);
-            return getDefaultData();
-        }
-    } catch (error) {
-        console.error('Error fetching sensor data:', error);
-        return getDefaultData();
-    }
-}
-
-// Function to fetch historical data for charts
-async function fetchHistoricalData() {
-    try {
-        const response = await fetch('/accounts/api/sensordata/historical/');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        
-        if (data.success) {
-            return data.data;
-        } else {
-            console.error('Failed to fetch historical data:', data.message);
-            return [];
-        }
-    } catch (error) {
-        console.error('Error fetching historical data:', error);
-        return [];
-    }
-}
-
-function getDefaultData() {
-    return {
-        aqi: 0,
-        temperature: 0,
-        humidity: 0,
-        timestamp: new Date().toISOString()
-    };
-}
-
-function getAqiDetails(aqi) {
-    if (aqi <= 50) {
-        return {
-            level: 'Good',
-            colorClass: 'aqi-good',
-        };
-    } else if (aqi <= 100) {
-        return {
-            level: 'Moderate',
-            colorClass: 'aqi-moderate',
-        };
-    } else if (aqi <= 150) {
-        return {
-            level: 'Unhealthy for Sensitive Groups',
-            colorClass: 'aqi-unhealthy-sensitive',
-        };
-    } else if (aqi <= 200) {
-        return {
-            level: 'Unhealthy',
-            colorClass: 'aqi-unhealthy',
-        };
-    } else if (aqi <= 300) {
-        return {
-            level: 'Very Unhealthy',
-            colorClass: 'aqi-very-unhealthy',
-        };
-    } else {
-        return {
-            level: 'Hazardous',
-            colorClass: 'aqi-hazardous',
-        };
-    }
-}
-
-// Initialize chart with proper configuration
-function initChart() {
-    const ctx = document.getElementById('dataChart').getContext('2d');
-    
-    dataChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: historicalData.timestamps,
-            datasets: [{
-                label: 'AQI',
-                data: historicalData.aqi,
-                borderColor: '#1e3a8a',
-                backgroundColor: 'rgba(30, 58, 138, 0.1)',
-                borderWidth: 2,
-                tension: 0.1,
-                fill: true,
-                pointRadius: 2,
-                pointHoverRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    grace: '5%',
-                    ticks: {
-                        precision: 0
-                    }
-                },
-                x: {
-                    ticks: {
-                        maxRotation: 45,
-                        minRotation: 45,
-                        autoSkip: true,
-                        maxTicksLimit: 10
-                    },
-                    grid: {
-                        display: false
-                    }
+        // Function to fetch latest data from server
+        async function fetchLatestData() {
+            try {
+                const response = await fetch('/accounts/api/sensordata/latest/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.data;
+                } else {
+                    console.error('Failed to fetch sensor data:', data.message);
+                    return getDefaultData();
+                }
+            } catch (error) {
+                console.error('Error fetching sensor data:', error);
+                return getDefaultData();
+            }
+        }
+
+        // Function to fetch historical data for charts
+        async function fetchHistoricalData() {
+            try {
+                const response = await fetch('/accounts/api/sensordata/historical/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.data;
+                } else {
+                    console.error('Failed to fetch historical data:', data.message);
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error fetching historical data:', error);
+                return [];
+            }
+        }
+
+        function getDefaultData() {
+            return {
+                aqi: 0,
+                temperature: 0,
+                humidity: 0,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function getAqiDetails(aqi) {
+            if (aqi <= 50) {
+                return {
+                    level: 'Good',
+                    colorClass: 'aqi-good',
+                };
+            } else if (aqi <= 100) {
+                return {
+                    level: 'Moderate',
+                    colorClass: 'aqi-moderate',
+                };
+            } else if (aqi <= 150) {
+                return {
+                    level: 'Unhealthy for Sensitive Groups',
+                    colorClass: 'aqi-unhealthy-sensitive',
+                };
+            } else if (aqi <= 200) {
+                return {
+                    level: 'Unhealthy',
+                    colorClass: 'aqi-unhealthy',
+                };
+            } else if (aqi <= 300) {
+                return {
+                    level: 'Very Unhealthy',
+                    colorClass: 'aqi-very-unhealthy',
+                };
+            } else {
+                return {
+                    level: 'Hazardous',
+                    colorClass: 'aqi-hazardous',
+                };
+            }
+        }
+
+        // Initialize chart with proper bounds
+        function initChart() {
+            const ctx = document.getElementById('dataChart').getContext('2d');
+            
+            dataChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: historicalData.timestamps,
+                    datasets: [{
+                        label: 'AQI',
+                        data: historicalData.aqi,
+                        borderColor: '#1e3a8a',
+                        backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }]
                 },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}`;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grace: '10%',
+                            min: 0,
+                            max: Math.max(...historicalData.aqi) + 20,
+                            ticks: {
+                                precision: 0,
+                                padding: 10
+                            },
+                            grid: {
+                                drawBorder: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 10,
+                                padding: 10
+                            },
+                            grid: {
+                                display: false,
+                                drawBorder: true
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            padding: 10,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            bodySpacing: 5,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}`;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    layout: {
+                        padding: {
+                            top: 20,
+                            right: 20,
+                            bottom: 20,
+                            left: 20
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderJoinStyle: 'round'
+                        },
+                        point: {
+                            hoverRadius: 8,
+                            hitRadius: 10
                         }
                     }
                 }
-            },
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            },
-            layout: {
-                padding: {
-                    top: 10,
-                    right: 10,
-                    bottom: 10,
-                    left: 10
+            });
+        }
+
+        // Update chart data with proper bounds
+        function updateChart(dataType) {
+            let label, data, borderColor, backgroundColor, min, max;
+            
+            switch(dataType) {
+                case 'temperature':
+                    label = 'Temperature (°C)';
+                    data = historicalData.temperature;
+                    borderColor = '#ef4444';
+                    backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    min = Math.floor(Math.min(...data)) - 2;
+                    max = Math.ceil(Math.max(...data)) + 2;
+                    break;
+                case 'humidity':
+                    label = 'Humidity (%)';
+                    data = historicalData.humidity;
+                    borderColor = '#3b82f6';
+                    backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                    min = 0;
+                    max = 100;
+                    break;
+                case 'aqi':
+                default:
+                    label = 'AQI';
+                    data = historicalData.aqi;
+                    borderColor = '#1e3a8a';
+                    backgroundColor = 'rgba(30, 58, 138, 0.1)';
+                    min = 0;
+                    max = Math.ceil(Math.max(...data)) + 20;
+                    break;
+            }
+            
+            dataChart.data.datasets = [{
+                label: label,
+                data: data,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                borderWidth: 2,
+                tension: 0.1,
+                fill: true,
+                pointRadius: 3,
+                pointHoverRadius: 6
+            }];
+            
+            // Update y-axis scale based on data type
+            dataChart.options.scales.y.min = min;
+            dataChart.options.scales.y.max = max;
+            
+            dataChart.update();
+        }
+
+        // Tab switching for charts
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                updateChart(this.dataset.chart);
+            });
+        });
+
+        // Process historical data for chart with proper time formatting
+        function processHistoricalData(data) {
+            historicalData = {
+                aqi: [],
+                temperature: [],
+                humidity: [],
+                timestamps: []
+            };
+            
+            // Sort data by timestamp (oldest first)
+            data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            
+            // Process each data point
+            data.forEach(item => {
+                historicalData.aqi.push(item.aqi);
+                historicalData.temperature.push(item.temperature);
+                historicalData.humidity.push(item.humidity);
+                
+                // Format timestamp for display
+                const date = new Date(item.timestamp);
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                historicalData.timestamps.push(`${hours}:${minutes}`);
+            });
+            
+            // If we have too many data points, show only every nth label
+            if (historicalData.timestamps.length > 15) {
+                const step = Math.ceil(historicalData.timestamps.length / 10);
+                historicalData.timestamps = historicalData.timestamps.map((ts, i) => 
+                    i % step === 0 ? ts : ''
+                );
+            }
+        }
+
+        // Update dashboard with latest data
+        async function updateDashboard() {
+            try {
+                // Fetch latest data point
+                const latestData = await fetchLatestData();
+                
+                if (latestData) {
+                    const aqiDetails = getAqiDetails(latestData.aqi);
+                    const aqiCard = document.getElementById('aqi-card');
+                    
+                    // Update AQI card
+                    aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
+                    document.getElementById('aqi-value').textContent = Math.round(latestData.aqi);
+                    document.getElementById('aqi-status').textContent = aqiDetails.level;
+                    
+                    // Update temperature and humidity
+                    document.getElementById('temperature').textContent = `${Math.round(latestData.temperature)}°C`;
+                    document.getElementById('humidity').textContent = `${Math.round(latestData.humidity)}%`;
+                    
+                    // Update timestamp
+                    const lastUpdated = new Date(latestData.timestamp);
+                    document.getElementById('aqi-update').textContent = `Last updated: ${lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
                 }
+                
+                // Fetch and update historical data for chart
+                const historical = await fetchHistoricalData();
+                if (historical.length > 0) {
+                    processHistoricalData(historical);
+                    if (!dataChart) {
+                        initChart();
+                    } else {
+                        updateChart(document.querySelector('.chart-tab.active').dataset.chart);
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
             }
         }
-    });
-}
 
-// Update chart data with proper scaling
-function updateChart(dataType) {
-    let label, data, borderColor, backgroundColor, min, max;
-    
-    switch(dataType) {
-        case 'temperature':
-            label = 'Temperature (°C)';
-            data = historicalData.temperature;
-            borderColor = '#ef4444';
-            backgroundColor = 'rgba(239, 68, 68, 0.1)';
-            min = Math.min(...data) - 2;
-            max = Math.max(...data) + 2;
-            break;
-        case 'humidity':
-            label = 'Humidity (%)';
-            data = historicalData.humidity;
-            borderColor = '#3b82f6';
-            backgroundColor = 'rgba(59, 130, 246, 0.1)';
-            min = 0;
-            max = 100;
-            break;
-        case 'aqi':
-        default:
-            label = 'AQI';
-            data = historicalData.aqi;
-            borderColor = '#1e3a8a';
-            backgroundColor = 'rgba(30, 58, 138, 0.1)';
-            min = 0;
-            max = Math.max(...data) + 10;
-            break;
-    }
-    
-    dataChart.data.datasets = [{
-        label: label,
-        data: data,
-        borderColor: borderColor,
-        backgroundColor: backgroundColor,
-        borderWidth: 2,
-        tension: 0.1,
-        fill: true,
-        pointRadius: 2,
-        pointHoverRadius: 5
-    }];
-    
-    // Update y-axis scale based on data type
-    dataChart.options.scales.y.min = min;
-    dataChart.options.scales.y.max = max;
-    
-    dataChart.update();
-}
-
-// Process historical data for chart with proper time formatting
-function processHistoricalData(data) {
-    historicalData = {
-        aqi: [],
-        temperature: [],
-        humidity: [],
-        timestamps: []
-    };
-    
-    // Sort data by timestamp (oldest first)
-    data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-    
-    // Process each data point
-    data.forEach(item => {
-        historicalData.aqi.push(item.aqi);
-        historicalData.temperature.push(item.temperature);
-        historicalData.humidity.push(item.humidity);
-        
-        // Format timestamp for display
-        const date = new Date(item.timestamp);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        historicalData.timestamps.push(`${hours}:${minutes}`);
-    });
-    
-    // If we have too many data points, show only every nth label
-    if (historicalData.timestamps.length > 15) {
-        const step = Math.ceil(historicalData.timestamps.length / 10);
-        historicalData.timestamps = historicalData.timestamps.map((ts, i) => 
-            i % step === 0 ? ts : ''
-        );
-    }
-}
-
-// Tab switching for charts
-document.querySelectorAll('.chart-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-        document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        updateChart(this.dataset.chart);
-    });
-});
-
-// Update dashboard with latest data
-async function updateDashboard() {
-    try {
-        // Fetch latest data point
-        const latestData = await fetchLatestData();
-        
-        if (latestData) {
-            const aqiDetails = getAqiDetails(latestData.aqi);
-            const aqiCard = document.getElementById('aqi-card');
-            
-            // Update AQI card
-            aqiCard.className = `card aqi-card ${aqiDetails.colorClass}`;
-            document.getElementById('aqi-value').textContent = Math.round(latestData.aqi);
-            document.getElementById('aqi-status').textContent = aqiDetails.level;
-            
-            // Update temperature and humidity
-            document.getElementById('temperature').textContent = `${Math.round(latestData.temperature)}°C`;
-            document.getElementById('humidity').textContent = `${Math.round(latestData.humidity)}%`;
-            
-            // Update timestamp
-            const lastUpdated = new Date(latestData.timestamp);
-            document.getElementById('aqi-update').textContent = `Last updated: ${lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})`;
-        }
-        
-        // Fetch and update historical data for chart
-        const historical = await fetchHistoricalData();
-        if (historical.length > 0) {
-            processHistoricalData(historical);
-            if (!dataChart) {
-                initChart();
-            } else {
-                updateChart(document.querySelector('.chart-tab.active').dataset.chart);
-            }
-        }
-    } catch (error) {
-        console.error('Error updating dashboard:', error);
-    }
-}
-
-// Initialize and update every 15 seconds
-document.addEventListener('DOMContentLoaded', function() {
-    updateDashboard();
-    setInterval(updateDashboard, 20000);
-});
+        // Initialize and update every 15 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            setInterval(updateDashboard, 15000);
+        });
     </script>
 </body>
 </html>

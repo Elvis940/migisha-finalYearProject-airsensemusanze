@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>admin view - AirSense Musanze</title>
+    <title>User Dashboard - AirSense Musanze</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Base Styles */
@@ -237,8 +237,7 @@
             display: inline-block;
             width: 80px;
         }
-
-        .btn {
+.btn {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -256,7 +255,6 @@
 .btn-primary:hover {
     background-color: #1d4ed8;
 }
-
 
         /* AQI Colors */
         .aqi-good { background-color: #10b981; }
@@ -319,6 +317,7 @@
     </style>
 </head>
 <body>
+    <!-- Header -->
     <header>
     <div class="logo">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -383,6 +382,12 @@
             </div>
         </div>
     </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; <span id="current-year"></span> 
+        </div>
+    </footer>
 
     <script>
         // Set current year in footer

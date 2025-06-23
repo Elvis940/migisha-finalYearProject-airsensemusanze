@@ -58,7 +58,7 @@ def latest_sensor_data(request):
                     'aqi': latest_data.aqi,
                     'temperature': latest_data.temperature,
                     'humidity': latest_data.humidity,
-                    'timestamp': latest_data.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                     'timestamp': latest_data.timestamp.astimezone(ZoneInfo('Africa/Nairobi')).strftime('%Y-%m-%d %H:%M:%S')
                 }
             }
             return JsonResponse(data)

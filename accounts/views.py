@@ -123,6 +123,9 @@ def login_view(request):
     
     return render(request, 'accounts/login.html')
     
+def admin_dashboard(request):
+    return render(request, 'accounts/admin_dashboard.html')
+    
 def user_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')

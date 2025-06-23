@@ -18,6 +18,60 @@
             --white: #ffffff;
             --black: #1e293b;
         }
+
+        /* Add to your existing CSS */
+.header-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* Update the existing admin-actions to handle the new layout */
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+    .header-buttons {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .header-buttons .btn {
+        flex-grow: 1;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .admin-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .welcome {
+        margin-bottom: 0.5rem;
+    }
+}
         * {
             box-sizing: border-box;
             margin: 0;
@@ -603,21 +657,20 @@
             </svg>
             <span>AirSense Musanze</span>
         </a>
-        <div class="admin-actions">
-            <span class="welcome">Welcome, {{ request.user.first_name }}</span>
-            <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+       <div class="header-buttons">
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
         </div>
     </header>
 
     <!-- Content -->
-    <div class="content">
-        <div class="dashboard-header">
-            <h2>User Accounts</h2>
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
-                <button id="registerNewUser" class="btn btn-success">Register New User</button>
-            </div>
+     <div class="dashboard-header">
+        <h2>User Management</h2>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
+            <button id="registerNewUser" class="btn btn-success">Register New User</button>
         </div>
+    </div>
 
         <!-- User Table -->
         <div class="table-container">

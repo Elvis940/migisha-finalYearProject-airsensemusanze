@@ -58,7 +58,7 @@ def latest_sensor_data(request):
                     'aqi': latest_data.aqi,
                     'temperature': latest_data.temperature,
                     'humidity': latest_data.humidity,
-                     'timestamp': latest_data.timestamp.astimezone(ZoneInfo('Africa/Nairobi')).strftime('%Y-%m-%d %H:%M:%S')
+                     'timestamp': latest_data.timestamp.astimezone(ZoneInfo('Africa/Kigali')).strftime('%Y-%m-%d %H:%M:%S')
                 }
             }
             return JsonResponse(data)
@@ -70,7 +70,7 @@ def latest_sensor_data(request):
                     'aqi': 0,
                     'temperature': 0,
                     'humidity': 0,
-                    'timestamp': latest_data.timestamp.astimezone(ZoneInfo('Africa/Nairobi')).strftime('%Y-%m-%d %H:%M:%S')
+                    'timestamp': timezone.now().strftime('%Y-%m-%d %H:%M:%S')
 
                 }
             })

@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
 from django.utils import timezone
-
+from zoneinfo import ZoneInfo
 from airsense_project.settings import DEFAULT_FROM_EMAIL
 from .models import CustomUser
 from .forms import CustomUserForm
@@ -70,7 +70,10 @@ def latest_sensor_data(request):
                     'aqi': 0,
                     'temperature': 0,
                     'humidity': 0,
-                    'timestamp': timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+           timestamp = latest_data.timestamp.astimezone(ZoneInfo('Africa/Nairobi')).strftime('%Y-%m-%d %H:%M:%S')
+
                 }
             })
     return JsonResponse({

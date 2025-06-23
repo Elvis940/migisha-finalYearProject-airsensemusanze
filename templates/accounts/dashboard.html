@@ -613,12 +613,15 @@
     <!-- Content -->
     <div class="content">
         <div class="dashboard-header">
-            <h2>User Accounts</h2>
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
-                <button id="registerNewUser" class="btn btn-success">Register New User</button>
-            </div>
-        </div>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <h2>User Accounts</h2>
+        <a href="{% url 'user_dashboard' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Dashboard</a>
+    </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
+        <button id="registerNewUser" class="btn btn-success">Register New User</button>
+    </div>
+   </div>
 
         <!-- User Table -->
         <div class="table-container">

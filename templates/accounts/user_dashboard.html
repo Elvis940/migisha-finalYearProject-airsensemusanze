@@ -77,13 +77,14 @@
             background-color: #ea580c;
         }
 
-        /* Main Content */
-        main {
+ main {
             padding: 1rem;
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
             box-sizing: border-box;
+            min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+            padding-bottom: 80px; /* Should match footer height */
         }
 
         /* Metrics Section */
@@ -238,19 +239,29 @@
             width: 80px;
         }
 
-        /* Footer */
+     /* Footer - Updated to be fixed */
         footer {
             background-color: #1e293b;
             color: white;
             padding: 1rem;
             font-size: clamp(0.7rem, 3vw, 0.9rem);
-            margin-top: 2rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 80px; /* Set a fixed height */
+            box-sizing: border-box;
         }
 
-        .footer-content {
+ .footer-content {
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
         }
 
         .footer-content a {

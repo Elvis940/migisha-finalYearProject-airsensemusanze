@@ -70,9 +70,7 @@ def latest_sensor_data(request):
                     'aqi': 0,
                     'temperature': 0,
                     'humidity': 0,
-
-
-           timestamp = latest_data.timestamp.astimezone(ZoneInfo('Africa/Nairobi')).strftime('%Y-%m-%d %H:%M:%S')
+                    'timestamp': = latest_data.timestamp.astimezone(ZoneInfo('Africa/Nairobi')).strftime('%Y-%m-%d %H:%M:%S')
 
                 }
             })

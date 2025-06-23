@@ -83,14 +83,14 @@ def login_view(request):
         password = request.POST.get('password')
         
         # Hardcoded admin credentials
-        if username == 'Elvis' and password == 'Godiswilling231@':
+        if username == 'Admin' and password == 'airsensemusanze':
             # Create or get the admin user
             admin_user, created = CustomUser.objects.get_or_create(
                 username=username,
                 defaults={
-                    'first_name': 'Elvis',
-                    'last_name': 'Harmon',
-                    'email': 'elvis@example.com',
+                    'first_name': 'Elysee',
+                    'last_name': 'Migisha',
+                    'email': 'airsensemail@gmail.com',
                     'role': 'admin',
                     'status': 'active',
                     'is_staff': True,

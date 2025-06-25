@@ -405,16 +405,14 @@ function getAqiDetails(aqi) {
             level: 'Unhealthy',
             colorClass: 'aqi-unhealthy',
             emoji: '🤧',
-            recommendation: "Everyone may begin to feel the effects of poor air quality. People in sensitive groups should stay indoors as much as possible. Outdoor physical activities should be limited, and those who need to go outside are encouraged to wear masks and avoid heavy exertion. Keep windows closed to maintain indoor air quality.
-"
+            recommendation: "Everyone may begin to feel the effects of poor air quality. People in sensitive groups should stay indoors as much as possible. Outdoor physical activities should be limited, and those who need to go outside are encouraged to wear masks and avoid heavy exertion. Keep windows closed to maintain indoor air quality."
         };
     } else if (aqi <= 300) {
         return {
             level: 'Very Unhealthy',
             colorClass: 'aqi-very-unhealthy',
             emoji: '🤢',
-            recommendation: "This level poses health risks to everyone, not just those in vulnerable categories. Strongly consider avoiding outdoor activity altogether. If you must be outside, wear a high-quality mask. Indoors, use fans, filters, or air purifiers, and keep doors and windows tightly shut to avoid outside air entering.
-"
+            recommendation: "This level poses health risks to everyone, not just those in vulnerable categories. Strongly consider avoiding outdoor activity altogether. If you must be outside, wear a high-quality mask. Indoors, use fans, filters, or air purifiers, and keep doors and windows tightly shut to avoid outside air entering."
         };
     } else {
         return {

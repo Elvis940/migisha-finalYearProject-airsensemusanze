@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>User Dashboard - AirSense Musanze</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Base Styles */
         body {
@@ -86,13 +88,92 @@
             box-sizing: border-box;
         }
 
+        /* Graph Section */
+        .graph-container {
+            margin-top: 1rem;
+        }
+
+        .graph-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 2rem;
+        }
+
+        .graph-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .graph-title {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: calc(100% - 30px);
+        }
+
+        .chart-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .chart-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .chart-tab.active {
+            color: #1e3a8a;
+            border-bottom-color: #1e3a8a;
+        }
+
+        .download-btn {
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .download-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .download-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
         /* Metrics Section */
         .metrics-container {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             width: 100%;
-            margin-top: 1rem;
         }
 
         .metrics-row {
@@ -177,49 +258,6 @@
             opacity: 0.8;
         }
 
-        /* Graph Section */
-        .graph-container {
-            margin-top: 2rem;
-        }
-
-        .graph-card {
-            padding: 1.5rem;
-            height: 400px;
-            position: relative;
-        }
-
-        .graph-title {
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e3a8a;
-        }
-
-        .chart-container {
-            width: 100%;
-            height: calc(100% - 30px);
-        }
-
-        .chart-tabs {
-            display: flex;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .chart-tab {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .chart-tab.active {
-            color: #1e3a8a;
-            border-bottom-color: #1e3a8a;
-        }
-
         /* User Info Section */
         .user-info {
             margin-top: 2rem;
@@ -296,6 +334,11 @@
                 padding: 0.5rem;
                 font-size: 0.8rem;
             }
+
+            .download-btn {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -341,7 +384,30 @@
 
     <!-- Main Content -->
     <main>
-        <!-- Metrics Section -->
+        <!-- Graph Section (now first) -->
+        <div class="graph-container">
+            <div class="card graph-card">
+                <h3 class="graph-title">
+                    Air Quality Data Visualization
+                    <button id="downloadData" class="download-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download Data
+                    </button>
+                </h3>
+                <div class="chart-tabs">
+                    <div class="chart-tab active" data-chart="aqi">AQI</div>
+                    <div class="chart-tab" data-chart="temperature">Temperature</div>
+                    <div class="chart-tab" data-chart="humidity">Humidity</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dataChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Section (now after graph) -->
         <div class="metrics-container">
             <div class="metrics-row">
                 <!-- AQI Card -->
@@ -372,21 +438,6 @@
                         <p class="metric-label">Humidity</p>
                         <p class="metric-value" id="humidity">--%</p>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Graph Section -->
-        <div class="graph-container">
-            <div class="card graph-card">
-                <h3 class="graph-title">Air Quality Data Visualization</h3>
-                <div class="chart-tabs">
-                    <div class="chart-tab active" data-chart="aqi">AQI</div>
-                    <div class="chart-tab" data-chart="temperature">Temperature</div>
-                    <div class="chart-tab" data-chart="humidity">Humidity</div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="dataChart"></canvas>
                 </div>
             </div>
         </div>
@@ -660,6 +711,104 @@
             });
         }
 
+        // Function to download data as CSV
+        function downloadDataAsCSV() {
+            if (historicalData.timestamps.length === 0) {
+                alert('No data available to download.');
+                return;
+            }
+
+            let csvContent = "Timestamp,AQI,Temperature (°C),Humidity (%)\n";
+            
+            for (let i = 0; i < historicalData.timestamps.length; i++) {
+                const row = [
+                    historicalData.timestamps[i],
+                    historicalData.aqi[i],
+                    historicalData.temperature[i],
+                    historicalData.humidity[i]
+                ].join(',');
+                csvContent += row + '\n';
+            }
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `airsense_data_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Function to download chart as image
+        function downloadChartAsImage() {
+            const canvas = document.getElementById('dataChart');
+            const link = document.createElement('a');
+            link.download = `airsense_chart_${new Date().toISOString().split('T')[0]}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Function to show download options
+        function showDownloadOptions() {
+            const options = [
+                { text: 'Download Chart as Image', action: downloadChartAsImage },
+                { text: 'Download Data as CSV', action: downloadDataAsCSV }
+            ];
+            
+            const menu = document.createElement('div');
+            menu.style.position = 'absolute';
+            menu.style.backgroundColor = 'white';
+            menu.style.borderRadius = '0.5rem';
+            menu.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            menu.style.padding = '0.5rem 0';
+            menu.style.zIndex = '1000';
+            
+            options.forEach(option => {
+                const item = document.createElement('button');
+                item.textContent = option.text;
+                item.style.display = 'block';
+                item.style.width = '100%';
+                item.style.textAlign = 'left';
+                item.style.padding = '0.5rem 1rem';
+                item.style.border = 'none';
+                item.style.background = 'none';
+                item.style.cursor = 'pointer';
+                item.style.fontSize = '0.9rem';
+                item.style.color = '#1e3a8a';
+                item.addEventListener('click', () => {
+                    option.action();
+                    document.body.removeChild(menu);
+                });
+                item.addEventListener('mouseenter', () => {
+                    item.style.backgroundColor = '#f0f4f8';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.backgroundColor = 'transparent';
+                });
+                menu.appendChild(item);
+            });
+            
+            const buttonRect = document.getElementById('downloadData').getBoundingClientRect();
+            menu.style.top = `${buttonRect.bottom + window.scrollY}px`;
+            menu.style.right = `${window.innerWidth - buttonRect.right}px`;
+            
+            document.body.appendChild(menu);
+            
+            // Close menu when clicking outside
+            const closeMenu = (e) => {
+                if (!menu.contains(e.target) {
+                    document.body.removeChild(menu);
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', closeMenu);
+            }, 0);
+        }
+
         // Update dashboard with latest data
         async function updateDashboard() {
             try {
@@ -703,6 +852,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateDashboard();
             setInterval(updateDashboard, 30000);
+            
+            // Add download button event listener
+            document.getElementById('downloadData').addEventListener('click', showDownloadOptions);
         });
     </script>
 </body>

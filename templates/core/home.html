@@ -375,51 +375,48 @@
             lastUpdated: new Date()
         };
 
-function getAqiDetails(aqi) {
+        function getAqiDetails(aqi) {
     if (aqi <= 50) {
         return {
             level: 'Good',
             colorClass: 'aqi-good',
             emoji: '😊',
-            recommendation: "The air quality is excellent, and the atmosphere is fresh and clean. It’s a perfect time to enjoy outdoor activities like walking, jogging, cycling, or taking children out to play. No precautions are necessary. This is the kind of air we all hope for!
-"
+            recommendation: "Air quality is excellent. Safe for everyone, including children and pregnant women. Enjoy outdoor activities freely."
         };
     } else if (aqi <= 100) {
         return {
             level: 'Moderate',
             colorClass: 'aqi-moderate',
             emoji: '🙂',
-            recommendation: "The air quality is generally acceptable, though some pollutants may slightly affect a very small number of unusually sensitive individuals. People with asthma, allergies, or other respiratory conditions should monitor how they feel, but most can continue normal outdoor activities without concern.
-"
+            recommendation: "Air quality is acceptable. Sensitive groups such as children, elderly, and pregnant women should limit prolonged outdoor exposure during heavy activities."
         };
     } else if (aqi <= 150) {
         return {
             level: 'Unhealthy for Sensitive Groups',
             colorClass: 'aqi-unhealthy-sensitive',
             emoji: '😷',
-            recommendation: "At this level, sensitive groups such as children, elderly individuals, and people with heart or lung conditions may start to experience mild health effects. It’s advisable for them to reduce long outdoor activities and consider wearing protective masks if staying outside for extended periods. The general public is not likely to be affected at this stage.
-"
+            recommendation: "Children, pregnant women, elderly, and individuals with respiratory or heart conditions should reduce outdoor exertion. Consider wearing a mask when outdoors."
         };
     } else if (aqi <= 200) {
         return {
             level: 'Unhealthy',
             colorClass: 'aqi-unhealthy',
             emoji: '🤧',
-            recommendation: "Everyone may begin to feel the effects of poor air quality. People in sensitive groups should stay indoors as much as possible. Outdoor physical activities should be limited, and those who need to go outside are encouraged to wear masks and avoid heavy exertion. Keep windows closed to maintain indoor air quality."
+            recommendation: "Everyone may begin to experience health effects. Sensitive groups should stay indoors. Avoid heavy outdoor activities and wear a certified face mask if necessary to go outside."
         };
     } else if (aqi <= 300) {
         return {
             level: 'Very Unhealthy',
             colorClass: 'aqi-very-unhealthy',
             emoji: '🤢',
-            recommendation: "This level poses health risks to everyone, not just those in vulnerable categories. Strongly consider avoiding outdoor activity altogether. If you must be outside, wear a high-quality mask. Indoors, use fans, filters, or air purifiers, and keep doors and windows tightly shut to avoid outside air entering."
+            recommendation: "Health alert: children, pregnant women, and individuals with existing conditions must remain indoors. Everyone should avoid outdoor activity and use air purifiers if available."
         };
     } else {
         return {
             level: 'Hazardous',
             colorClass: 'aqi-hazardous',
             emoji: '💀',
-            recommendation: "Health warnings of emergency conditions. Everyone is at risk. The public should avoid all outdoor exposure. Remain indoors with all windows and doors shut, and if possible, run an air purifier. Only go outside if absolutely necessary, and always use a certified pollution mask. Follow any local health or emergency instructions."
+            recommendation: "Emergency conditions: everyone is at risk of serious health effects. Stay indoors, close windows, avoid physical exertion, and use face masks or air purifiers. Pregnant women and children must not go outside."
         };
     }
 }

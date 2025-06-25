@@ -98,40 +98,49 @@
             background-color: white;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            height: 400px;
+            padding: 1rem;
+            height: auto; /* Changed from fixed height */
+            min-height: 300px; /* Minimum height */
             position: relative;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .graph-title {
             margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+            margin-bottom: 0.5rem; /* Reduced margin */
+            font-size: 1.1rem; /* Slightly smaller */
             font-weight: 600;
             color: #1e3a8a;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
         }
 
         .chart-container {
             width: 100%;
-            height: calc(100% - 30px);
+            height: 300px; /* Fixed height for better mobile experience */
+            position: relative;
         }
 
         .chart-tabs {
             display: flex;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem; /* Reduced margin */
             border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto; /* Allow horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            white-space: nowrap; /* Keep tabs in single line */
+            padding-bottom: 5px; /* Space for scrollbar */
         }
 
         .chart-tab {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem; /* Reduced padding */
             cursor: pointer;
             border-bottom: 2px solid transparent;
             font-weight: 500;
             color: #64748b;
+            font-size: 0.8rem; /* Smaller font */
+            flex-shrink: 0; /* Prevent tabs from shrinking */
         }
 
         .chart-tab.active {
@@ -143,14 +152,15 @@
             background-color: #1e3a8a;
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem; /* Smaller padding */
             border-radius: 0.5rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.8rem;
+            gap: 0.3rem; /* Reduced gap */
+            font-size: 0.75rem; /* Smaller font */
+            margin-top: 0.5rem; /* Space when wrapped */
         }
 
         .download-btn:hover {
@@ -159,14 +169,16 @@
 
         .download-options {
             position: absolute;
-            right: 1.5rem;
-            top: 4rem;
+            right: 1rem;
+            top: 3.5rem;
             background-color: white;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 0.5rem;
             z-index: 10;
             display: none;
+            width: max-content;
+            max-width: 90%; /* Prevent overflow */
         }
 
         .download-options.show {
@@ -174,10 +186,11 @@
         }
 
         .download-option {
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             cursor: pointer;
             border-radius: 0.25rem;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
 
         .download-option:hover {
@@ -205,7 +218,7 @@
             background-color: white;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
+            padding: 1.25rem; /* Slightly reduced padding */
             transition: transform 0.3s, box-shadow 0.3s;
             width: 100%;
             box-sizing: border-box;
@@ -224,28 +237,28 @@
         }
 
         .aqi-label {
-            font-size: clamp(1rem, 4vw, 1.2rem);
+            font-size: clamp(1rem, 4vw, 1.1rem); /* Slightly smaller */
             font-weight: 600;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px; /* Reduced spacing */
         }
 
         .aqi-value {
-            font-size: clamp(2rem, 8vw, 3rem);
+            font-size: clamp(1.8rem, 8vw, 2.5rem); /* Slightly smaller */
             font-weight: bold;
-            margin: 1rem 0;
+            margin: 0.75rem 0; /* Reduced margin */
             line-height: 1;
         }
 
         .aqi-status {
-            font-size: clamp(0.8rem, 3vw, 1rem);
+            font-size: clamp(0.75rem, 3vw, 0.9rem); /* Slightly smaller */
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
         .aqi-update {
-            font-size: clamp(0.7rem, 3vw, 0.9rem);
+            font-size: clamp(0.65rem, 3vw, 0.8rem); /* Slightly smaller */
             opacity: 0.8;
         }
 
@@ -255,41 +268,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem; /* Reduced gap */
         }
 
         .metric-card svg {
-            width: 40px;
-            height: 40px;
+            width: 36px; /* Slightly smaller */
+            height: 36px;
             flex-shrink: 0;
         }
 
         .metric-value {
-            font-size: clamp(1.5rem, 6vw, 2rem);
+            font-size: clamp(1.3rem, 6vw, 1.8rem); /* Slightly smaller */
             font-weight: bold;
         }
 
         .metric-label {
-            font-size: clamp(0.7rem, 3vw, 0.9rem);
+            font-size: clamp(0.65rem, 3vw, 0.8rem); /* Slightly smaller */
             opacity: 0.8;
-        }
-
-        /* User Info Section */
-        .user-info {
-            margin-top: 2rem;
-        }
-
-        .user-info-card {
-            padding: 1.5rem;
-        }
-
-        .user-info-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .user-info-item strong {
-            display: inline-block;
-            width: 80px;
         }
 
         /* Footer */
@@ -328,6 +323,7 @@
         @media (max-width: 768px) {
             .metrics-row {
                 flex-direction: column;
+                gap: 0.75rem; /* Reduced gap */
             }
 
             .aqi-card, .metric-card {
@@ -336,19 +332,27 @@
             }
 
             .graph-card {
-                height: 350px;
-                padding: 1rem 0.5rem;
+                padding: 0.75rem; /* Reduced padding */
+                margin-bottom: 1rem; /* Reduced margin */
             }
 
             .chart-tabs {
-                overflow-x: auto;
-                white-space: nowrap;
-                padding-bottom: 5px;
+                padding-bottom: 3px; /* Reduced padding */
             }
 
             .chart-tab {
-                padding: 0.5rem;
-                font-size: 0.8rem;
+                padding: 0.4rem 0.6rem; /* Reduced padding */
+                font-size: 0.75rem; /* Smaller font */
+            }
+
+            .download-btn {
+                padding: 0.3rem 0.6rem; /* Smaller padding */
+                font-size: 0.7rem; /* Smaller font */
+            }
+
+            .download-options {
+                top: 3.2rem; /* Adjusted position */
+                right: 0.5rem; /* Adjusted position */
             }
         }
 
@@ -358,20 +362,62 @@
             }
 
             .header-nav {
-                gap: 1rem;
+                gap: 0.75rem; /* Reduced gap */
             }
 
-            .graph-card {
-                height: 300px;
+            .graph-title {
+                font-size: 1rem; /* Smaller font */
+                flex-direction: column; /* Stack title and button */
+                align-items: flex-start;
+                gap: 0.5rem;
             }
 
             .chart-container {
-                height: calc(100% - 50px);
+                height: 250px; /* Smaller height */
             }
 
             .chart-tab {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.7rem;
+                padding: 0.3rem 0.5rem; /* Smaller padding */
+                font-size: 0.7rem; /* Smaller font */
+            }
+
+            .download-options {
+                top: 4rem; /* Adjusted for stacked layout */
+                right: auto; /* Reset right positioning */
+                left: 0.5rem; /* Align with left edge */
+            }
+
+            .card {
+                padding: 1rem; /* Reduced padding */
+            }
+
+            .aqi-value {
+                margin: 0.5rem 0; /* Reduced margin */
+            }
+        }
+
+        /* Very small devices (phones, 360px and down) */
+        @media (max-width: 360px) {
+            .chart-container {
+                height: 220px; /* Even smaller height */
+            }
+
+            .chart-tab {
+                padding: 0.2rem 0.4rem; /* Very small padding */
+                font-size: 0.65rem; /* Very small font */
+            }
+
+            .aqi-label {
+                font-size: 0.9rem; /* Smaller font */
+            }
+
+            .aqi-value {
+                font-size: 1.5rem; /* Smaller font */
+            }
+
+            .metric-card svg {
+                width: 32px; /* Smaller icon */
+                height: 32px;
             }
         }
     </style>
@@ -402,7 +448,7 @@
                     <h3>Air Quality Data Visualization</h3>
                     <div class="download-container">
                         <button class="download-btn" id="download-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -570,9 +616,10 @@
             }
         }
 
-        // Initialize chart
+        // Initialize chart with mobile-friendly options
         function initChart() {
             const ctx = document.getElementById('dataChart').getContext('2d');
+            const isMobile = window.innerWidth <= 768;
             
             dataChart = new Chart(ctx, {
                 type: 'line',
@@ -583,11 +630,11 @@
                         data: historicalData.aqi,
                         borderColor: '#1e3a8a',
                         backgroundColor: 'rgba(30, 58, 138, 0.1)',
-                        borderWidth: 2,
+                        borderWidth: isMobile ? 1.5 : 2,
                         tension: 0.1,
                         fill: true,
-                        pointRadius: 3,
-                        pointHoverRadius: 5
+                        pointRadius: isMobile ? 2 : 3,
+                        pointHoverRadius: isMobile ? 4 : 5
                     }]
                 },
                 options: {
@@ -595,10 +642,10 @@
                     maintainAspectRatio: false,
                     layout: {
                         padding: {
-                            top: 20,
-                            right: 20,
-                            bottom: 30,
-                            left: 20
+                            top: 10,
+                            right: isMobile ? 5 : 15,
+                            bottom: isMobile ? 15 : 25,
+                            left: isMobile ? 5 : 15
                         }
                     },
                     scales: {
@@ -606,19 +653,26 @@
                             beginAtZero: false,
                             grace: '10%',
                             ticks: {
-                                padding: 10
+                                padding: isMobile ? 5 : 10,
+                                font: {
+                                    size: isMobile ? 10 : 12
+                                }
                             },
                             grid: {
-                                drawBorder: false
+                                drawBorder: false,
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         },
                         x: {
                             ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                padding: 10,
+                                maxRotation: isMobile ? 60 : 45,
+                                minRotation: isMobile ? 60 : 45,
+                                padding: isMobile ? 5 : 10,
                                 autoSkip: true,
-                                maxTicksLimit: 8
+                                maxTicksLimit: isMobile ? 6 : 8,
+                                font: {
+                                    size: isMobile ? 10 : 12
+                                }
                             },
                             grid: {
                                 display: false
@@ -631,21 +685,25 @@
                             position: 'top',
                             labels: {
                                 boxWidth: 12,
-                                padding: 20,
+                                padding: isMobile ? 10 : 15,
                                 font: {
-                                    size: window.innerWidth < 768 ? 10 : 12
-                                }
+                                    size: isMobile ? 10 : 12
+                                },
+                                usePointStyle: true
                             }
                         },
                         tooltip: {
                             mode: 'index',
                             intersect: false,
                             bodyFont: {
-                                size: window.innerWidth < 768 ? 10 : 12
+                                size: isMobile ? 10 : 12
                             },
                             titleFont: {
-                                size: window.innerWidth < 768 ? 10 : 12
-                            }
+                                size: isMobile ? 10 : 12
+                            },
+                            padding: isMobile ? 8 : 12,
+                            displayColors: true,
+                            usePointStyle: true
                         }
                     },
                     interaction: {
@@ -657,9 +715,10 @@
             });
         }
 
-        // Update chart data
+        // Update chart data with mobile-friendly options
         function updateChart(dataType) {
             let label, data, borderColor, backgroundColor;
+            const isMobile = window.innerWidth <= 768;
             
             switch(dataType) {
                 case 'temperature':
@@ -688,11 +747,11 @@
                 data: data,
                 borderColor: borderColor,
                 backgroundColor: backgroundColor,
-                borderWidth: 2,
+                borderWidth: isMobile ? 1.5 : 2,
                 tension: 0.1,
                 fill: true,
-                pointRadius: 3,
-                pointHoverRadius: 5
+                pointRadius: isMobile ? 2 : 3,
+                pointHoverRadius: isMobile ? 4 : 5
             }];
             
             dataChart.update();
@@ -795,39 +854,41 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const chartCanvas = document.getElementById('dataChart');
+            const isMobile = window.innerWidth <= 768;
             
             // Add title
-            doc.setFontSize(16);
+            doc.setFontSize(isMobile ? 14 : 16);
             doc.text('AirSense Musanze - Air Quality Data', 105, 20, { align: 'center' });
             
             // Add current date
-            doc.setFontSize(10);
-            doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 30, { align: 'center' });
+            doc.setFontSize(isMobile ? 8 : 10);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, isMobile ? 28 : 30, { align: 'center' });
             
             // Add chart image
             const chartImage = chartCanvas.toDataURL('image/png');
-            doc.addImage(chartImage, 'PNG', 15, 40, 180, 100);
+            doc.addImage(chartImage, 'PNG', 15, isMobile ? 35 : 40, 180, isMobile ? 90 : 100);
             
             // Add data table
-            doc.setFontSize(10);
-            doc.text('Recent Data Points:', 15, 150);
+            doc.setFontSize(isMobile ? 8 : 10);
+            doc.text('Recent Data Points:', 15, isMobile ? 140 : 150);
             
             // Table headers
-            doc.text('Timestamp', 15, 160);
-            doc.text('AQI', 60, 160);
-            doc.text('Temp (°C)', 90, 160);
-            doc.text('Humidity (%)', 130, 160);
+            doc.text('Timestamp', 15, isMobile ? 148 : 160);
+            doc.text('AQI', isMobile ? 50 : 60, isMobile ? 148 : 160);
+            doc.text('Temp (°C)', isMobile ? 75 : 90, isMobile ? 148 : 160);
+            doc.text('Humidity (%)', isMobile ? 110 : 130, isMobile ? 148 : 160);
             
             // Table data (last 10 points)
             const startIdx = Math.max(0, historicalData.timestamps.length - 10);
-            let yPos = 170;
+            let yPos = isMobile ? 156 : 170;
+            const rowHeight = isMobile ? 8 : 10;
             
             for (let i = startIdx; i < historicalData.timestamps.length; i++) {
                 doc.text(historicalData.timestamps[i], 15, yPos);
-                doc.text(historicalData.aqi[i].toString(), 60, yPos);
-                doc.text(historicalData.temperature[i].toString(), 90, yPos);
-                doc.text(historicalData.humidity[i].toString(), 130, yPos);
-                yPos += 10;
+                doc.text(historicalData.aqi[i].toString(), isMobile ? 50 : 60, yPos);
+                doc.text(historicalData.temperature[i].toString(), isMobile ? 75 : 90, yPos);
+                doc.text(historicalData.humidity[i].toString(), isMobile ? 110 : 130, yPos);
+                yPos += rowHeight;
             }
             
             // Save the PDF
@@ -878,6 +939,14 @@
             setupDownloadHandlers();
             updateDashboard();
             setInterval(updateDashboard, 30000);
+        });
+
+        // Handle window resize for chart adjustments
+        window.addEventListener('resize', function() {
+            if (dataChart) {
+                dataChart.resize();
+                dataChart.update();
+            }
         });
     </script>
 </body>

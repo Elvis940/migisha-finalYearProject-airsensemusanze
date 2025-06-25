@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>User Dashboard - AirSense Musanze</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         /* Base Styles */
         body {
@@ -107,6 +110,9 @@
             font-size: 1.2rem;
             font-weight: 600;
             color: #1e3a8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .chart-container {
@@ -131,6 +137,51 @@
         .chart-tab.active {
             color: #1e3a8a;
             border-bottom-color: #1e3a8a;
+        }
+
+        .download-btn {
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .download-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .download-options {
+            position: absolute;
+            right: 1.5rem;
+            top: 4rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            z-index: 10;
+            display: none;
+        }
+
+        .download-options.show {
+            display: block;
+        }
+
+        .download-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        .download-option:hover {
+            background-color: #f0f4f8;
         }
 
         /* Metrics Section - Moved below graph */
@@ -347,7 +398,24 @@
         <!-- Graph Section - Moved to top -->
         <div class="graph-container">
             <div class="card graph-card">
-                <h3 class="graph-title">Air Quality Data Visualization</h3>
+                <div class="graph-title">
+                    <h3>Air Quality Data Visualization</h3>
+                    <div class="download-container">
+                        <button class="download-btn" id="download-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download
+                        </button>
+                        <div class="download-options" id="download-options">
+                            <div class="download-option" data-format="png">Download as PNG</div>
+                            <div class="download-option" data-format="csv">Download as CSV</div>
+                            <div class="download-option" data-format="pdf">Download as PDF</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="chart-tabs">
                     <div class="chart-tab active" data-chart="aqi">AQI</div>
                     <div class="chart-tab" data-chart="temperature">Temperature</div>
@@ -663,6 +731,109 @@
             });
         }
 
+        // Download functionality
+        function setupDownloadHandlers() {
+            const downloadBtn = document.getElementById('download-btn');
+            const downloadOptions = document.getElementById('download-options');
+            
+            // Toggle download options
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadOptions.classList.toggle('show');
+            });
+            
+            // Close download options when clicking elsewhere
+            document.addEventListener('click', () => {
+                downloadOptions.classList.remove('show');
+            });
+            
+            // Handle download option clicks
+            document.querySelectorAll('.download-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const format = e.target.dataset.format;
+                    
+                    switch(format) {
+                        case 'png':
+                            downloadChartAsPNG();
+                            break;
+                        case 'csv':
+                            downloadDataAsCSV();
+                            break;
+                        case 'pdf':
+                            downloadChartAsPDF();
+                            break;
+                    }
+                    
+                    downloadOptions.classList.remove('show');
+                });
+            });
+        }
+        
+        // Download chart as PNG image
+        function downloadChartAsPNG() {
+            const link = document.createElement('a');
+            link.download = 'airsense-chart.png';
+            link.href = document.getElementById('dataChart').toDataURL('image/png');
+            link.click();
+        }
+        
+        // Download data as CSV
+        function downloadDataAsCSV() {
+            let csvContent = "Timestamp,AQI,Temperature,Humidity\n";
+            
+            for (let i = 0; i < historicalData.timestamps.length; i++) {
+                csvContent += `${historicalData.timestamps[i]},${historicalData.aqi[i]},${historicalData.temperature[i]},${historicalData.humidity[i]}\n`;
+            }
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            saveAs(blob, 'airsense-data.csv');
+        }
+        
+        // Download chart as PDF
+        function downloadChartAsPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const chartCanvas = document.getElementById('dataChart');
+            
+            // Add title
+            doc.setFontSize(16);
+            doc.text('AirSense Musanze - Air Quality Data', 105, 20, { align: 'center' });
+            
+            // Add current date
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 30, { align: 'center' });
+            
+            // Add chart image
+            const chartImage = chartCanvas.toDataURL('image/png');
+            doc.addImage(chartImage, 'PNG', 15, 40, 180, 100);
+            
+            // Add data table
+            doc.setFontSize(10);
+            doc.text('Recent Data Points:', 15, 150);
+            
+            // Table headers
+            doc.text('Timestamp', 15, 160);
+            doc.text('AQI', 60, 160);
+            doc.text('Temp (°C)', 90, 160);
+            doc.text('Humidity (%)', 130, 160);
+            
+            // Table data (last 10 points)
+            const startIdx = Math.max(0, historicalData.timestamps.length - 10);
+            let yPos = 170;
+            
+            for (let i = startIdx; i < historicalData.timestamps.length; i++) {
+                doc.text(historicalData.timestamps[i], 15, yPos);
+                doc.text(historicalData.aqi[i].toString(), 60, yPos);
+                doc.text(historicalData.temperature[i].toString(), 90, yPos);
+                doc.text(historicalData.humidity[i].toString(), 130, yPos);
+                yPos += 10;
+            }
+            
+            // Save the PDF
+            doc.save('airsense-report.pdf');
+        }
+
         // Update dashboard with latest data
         async function updateDashboard() {
             try {
@@ -704,6 +875,7 @@
 
         // Initialize and update every 15 seconds
         document.addEventListener('DOMContentLoaded', function() {
+            setupDownloadHandlers();
             updateDashboard();
             setInterval(updateDashboard, 30000);
         });

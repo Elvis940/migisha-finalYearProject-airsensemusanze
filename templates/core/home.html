@@ -388,7 +388,7 @@
             level: 'Moderate',
             colorClass: 'aqi-moderate',
             emoji: '🙂',
-            recommendation: "Air quality is acceptable. Sensitive groups such as children, elderly, and pregnant women should limit prolonged outdoor exposure during heavy activities."
+            recommendation: "Air is acceptable; only very sensitive people may feel minor effects. Most people can go outdoors as normal."
         };
     } else if (aqi <= 150) {
         return {
@@ -402,21 +402,21 @@
             level: 'Unhealthy',
             colorClass: 'aqi-unhealthy',
             emoji: '🤧',
-            recommendation: "Everyone may begin to experience health effects. Sensitive groups should stay indoors. Avoid heavy outdoor activities and wear a certified face mask if necessary to go outside."
+            recommendation: "Sensitive individuals should reduce long outdoor exposure.Masks are recommended if outside for extended time."
         };
     } else if (aqi <= 300) {
         return {
             level: 'Very Unhealthy',
             colorClass: 'aqi-very-unhealthy',
             emoji: '🤢',
-            recommendation: "Health alert: children, pregnant women, and individuals with existing conditions must remain indoors. Everyone should avoid outdoor activity and use air purifiers if available."
+            recommendation: "Avoid outdoor activities; all groups may experience health effects. Use masks and air purifiers indoors if needed."
         };
     } else {
         return {
             level: 'Hazardous',
             colorClass: 'aqi-hazardous',
             emoji: '💀',
-            recommendation: "Emergency conditions: everyone is at risk of serious health effects. Stay indoors, close windows, avoid physical exertion, and use face masks or air purifiers. Pregnant women and children must not go outside."
+            recommendation: "Emergency level—stay indoors and avoid all outdoor exposure.Go outside only if necessary, wearing a certified mask."
         };
     }
 }
